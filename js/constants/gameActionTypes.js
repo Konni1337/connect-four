@@ -1,0 +1,3 @@
+export const MAKE_MOVE = 'MAKE_MOVE';
+export const UPDATE_STATISTICS = 'UPDATE_STATISTICS';
+export const START_GAME = 'START_GAME';

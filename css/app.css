@@ -1,0 +1,16 @@
+.column {
+    width: 45px;
+    float: left;
+}
+
+.cell {
+    border: 1px solid black;
+    width: 100%;
+    height: 45px;
+}
+
+.value {
+    height: 45px;
+    width: 45px;
+    float: left;
+}
