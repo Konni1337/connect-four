@@ -4,9 +4,15 @@ import Statistics from "../components/Statistics";
 import Grid from "../components/Grid";
 import * as GameActions from "../actions/GameActions";
 import Game from "../lib/Game";
+import PlayerControls from './PlayerControls';
+import {PLAYER_TYPES} from '../constants/GameFixtures';
 
 function renderOptions(move, index) {
   return <option key={index} value={move.index}>{move.index + 1}</option>
+}
+
+function renderPlayerOption(playerType, index) {
+  return <option key={index} value={playerType}>{playerType}</option>
 }
 
 class GameContainer extends Component {
@@ -17,12 +23,14 @@ class GameContainer extends Component {
       1: PropTypes.number.isRequired,
       2: PropTypes.number.isRequired
     }),
+    players: PropTypes.arrayOf(String).isRequired,
+    values: PropTypes.arrayOf(Number).isRequired,
     isStarted: PropTypes.bool.isRequired
   };
 
   handleStartGame(event) {
     event.preventDefault();
-    this.props.startGame()
+    this.props.startGame(this.refs.player1.value, this.refs.player2.value)
   }
 
   handleMakeMove(event, moves) {
@@ -33,19 +41,22 @@ class GameContainer extends Component {
   }
 
   render() {
-    const {game, statistics, isStarted, values} = this.props;
+    const {game, statistics, isStarted, values, players} = this.props;
     const moves = game.getValidMoves();
     return (
       <div>
         <Statistics statistics={statistics}/>
-        <button onClick={this.handleStartGame.bind(this)}>Start Game</button>
+
+        <select ref="player1">{PLAYER_TYPES.map(renderPlayerOption)}</select>
+        <select ref="player2">{PLAYER_TYPES.map(renderPlayerOption)}</select>
+
+        {!isStarted && <button onClick={this.handleStartGame.bind(this)}>Start Game</button>}
+
         {isStarted && !game.isFinished && <div>
-          <select ref="moves">{moves.map(renderOptions)}</select>
-          <button onClick={event => this.handleMakeMove(event, moves)}>Make Move</button>
+          <PlayerControls game={game} players={players}/>
+          <Grid grid={game.grid} values={values}/>
         </div>
         }
-        <Grid grid={game.grid} values={values}/>
-        {game.isFinished && <strong>{'Player ' + game.result + ' won!'}</strong>}
       </div>
     )
   }

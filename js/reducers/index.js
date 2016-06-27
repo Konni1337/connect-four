@@ -1,11 +1,12 @@
 import {combineReducers} from "redux";
-import {MAKE_MOVE, UPDATE_STATISTICS, START_GAME} from "../constants/gameActionTypes";
+import {MAKE_MOVE, END_GAME, START_GAME} from "../constants/gameActionTypes";
 import Game from "../lib/Game";
 
 function game(state = new Game(), action) {
   switch (action.type) {
     case MAKE_MOVE:
       return action.game;
+    case END_GAME:
     case START_GAME:
       return new Game();
     default:
@@ -13,10 +14,19 @@ function game(state = new Game(), action) {
   }
 }
 
+function players(state = [], action) {
+  if (action.type === START_GAME) {
+    return action.players;
+  } else {
+    return state;
+  }
+}
+
 function values(state = [], action) {
   switch (action.type) {
     case MAKE_MOVE:
       return action.values;
+    case END_GAME:
     case START_GAME:
       return [];
     default:
@@ -32,7 +42,7 @@ let defaultStatistics = {
 
 function statistics(state = defaultStatistics, action) {
   switch (action.type) {
-    case UPDATE_STATISTICS:
+    case END_GAME:
       let newState = Object.assign({}, state);
       newState[action.result]++;
       return newState;
@@ -45,6 +55,8 @@ function isStarted(state = false, action) {
   switch (action.type) {
     case START_GAME:
       return true;
+    case END_GAME:
+      return false;
     default:
       return state;
   }
@@ -53,6 +65,7 @@ function isStarted(state = false, action) {
 
 export default combineReducers({
   game,
+  players,
   values,
   statistics,
   isStarted

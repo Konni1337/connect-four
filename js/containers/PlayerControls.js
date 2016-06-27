@@ -1,8 +1,7 @@
 import React, {Component, PropTypes} from "react";
 import {connect} from "react-redux";
-import Game from "../lib/game/Game";
+import Game from "../lib/Game";
 import * as GameActions from "../actions/GameActions";
-import HumanPlayer from "../lib/game/HumanPlayer";
 import {HUMAN} from "../constants/GameFixtures";
 
 class PlayerControls extends Component {
@@ -14,7 +13,7 @@ class PlayerControls extends Component {
   };
 
   renderMoves(move, index) {
-    return <button key={index} onClick={e => this.handleHumanMove(e, move)}>Push in {move.getColumnIndex() + 1}</button>
+    return <button key={index} onClick={e => this.handleHumanMove(e, move)}>Push in {move.index + 1}</button>
   }
 
   handleHumanMove(e, move) {
@@ -29,7 +28,7 @@ class PlayerControls extends Component {
 
   render() {
     const {game, players} = this.props;
-    if (players[game.currentPlayer] === HUMAN) {
+    if (players[game.currentPlayer - 1] === HUMAN) {
       return <div>
         {game.getValidMoves().map(this.renderMoves.bind(this))}
       </div>
