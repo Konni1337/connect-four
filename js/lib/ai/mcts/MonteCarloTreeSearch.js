@@ -1,21 +1,32 @@
-import {Root} from "./Root";
+import Root from "./Root";
 export default class MonteCarloTreeSearch {
-  constructor(game, exploreCount = 5000) {
-    this.game = game;
+  constructor(id, game, exploreCount = 5000) {
+    this.id = id;
     this.exploreCount = exploreCount;
-    this.root = new Root(game);
   }
 
-  findBestMove() {
+  selectAction(game, callback) {
+    let root = new Root(game);
     for (let i = 0; i < this.exploreCount; i++) {
-      this.root.exploreTree()
+      root.exploreTree()
     }
-    return this.root.bestMove();
+    this.values = root.children.map(child => child.value()).reverse();
+    callback(root.bestMove());
   }
 
+  /**
+   * Returns the values for each child
+   * Currently unused but usefull for debugging
+   *
+   * @returns {Array.<Number>}
+   */
   values() {
-    return this.root.children.map(child => child.value()).reverse()
+    return this.values;
   }
 
+  endGame() {}
 
+  isHuman() {
+    return false;
+  }
 }

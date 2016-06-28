@@ -13,7 +13,7 @@ function selectNodeToExplore(self) {
   return node;
 }
 
-export class Root extends Node {
+export default class Root extends Node {
   constructor(game) {
     super(game, null, null);
   }

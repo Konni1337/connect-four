@@ -1,6 +1,9 @@
 import {combineReducers} from "redux";
 import {MAKE_MOVE, END_GAME, START_GAME} from "../constants/gameActionTypes";
 import Game from "../lib/Game";
+import QLearning from "../lib/ai/q-learning/QLearning";
+import {TOGGLE_IS_TRAINING} from "../constants/gameActionTypes";
+import {SET_TRAINING_ITERATIONS} from "../constants/gameActionTypes";
 
 function game(state = new Game(), action) {
   switch (action.type) {
@@ -14,21 +17,14 @@ function game(state = new Game(), action) {
   }
 }
 
-function players(state = [], action) {
-  if (action.type === START_GAME) {
-    return action.players;
-  } else {
-    return state;
-  }
-}
-
-function values(state = [], action) {
+function players(state = {}, action) {
   switch (action.type) {
-    case MAKE_MOVE:
-      return action.values;
     case END_GAME:
+      state.player1 && state.player1.endGame(action.result);
+      state.player2 && state.player2.endGame(action.result);
+      return {};
     case START_GAME:
-      return [];
+      return {player1: action.player1, player2: action.player2};
     default:
       return state;
   }
@@ -62,11 +58,30 @@ function isStarted(state = false, action) {
   }
 }
 
+function trainingIterations(state = 0, action) {
+  switch (action.type) {
+    case SET_TRAINING_ITERATIONS:
+      return action.trainingIterations;
+    default:
+      return state;
+  }
+}
+
+function isTraining(state = false, action) {
+  switch (action.type) {
+    case TOGGLE_IS_TRAINING:
+      return action.isTraining;
+    default:
+      return state;
+  }
+}
+
 
 export default combineReducers({
   game,
   players,
-  values,
   statistics,
-  isStarted
+  isStarted,
+  isTraining,
+  trainingIterations
 }) 

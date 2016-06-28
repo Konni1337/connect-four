@@ -7,7 +7,10 @@ import {HUMAN} from "../constants/GameFixtures";
 class PlayerControls extends Component {
   static propTypes = {
     game: PropTypes.instanceOf(Game).isRequired,
-    players: PropTypes.arrayOf(String).isRequired,
+    players: PropTypes.shape({
+      player1: PropTypes.object,
+      player2: PropTypes.object
+    }).isRequired,
     makeHumanMove: PropTypes.func.isRequired,
     makeMove: PropTypes.func.isRequired
   };
@@ -21,19 +24,21 @@ class PlayerControls extends Component {
     this.props.makeHumanMove(move, this.props.game);
   }
 
-  handleMakeMove(e) {
+  handleMakeMove(e, currentPlayer, self) {
     e.preventDefault();
-    this.props.makeMove(this.props.game);
+    self.props.makeMove(self.props.game, currentPlayer);
   }
 
   render() {
     const {game, players} = this.props;
-    if (players[game.currentPlayer - 1] === HUMAN) {
+    const currentPlayer = game.currentPlayer === 1 ? players.player1 : players.player2;
+    const self = this;
+    if (currentPlayer.isHuman()) {
       return <div>
         {game.getValidMoves().map(this.renderMoves.bind(this))}
       </div>
     } else {
-      return <button onClick={this.handleMakeMove.bind(this)}>Make AI Moves</button>
+      return <button onClick={e => this.handleMakeMove(e, currentPlayer, self)}>Make AI Moves</button>
     }
   }
 }

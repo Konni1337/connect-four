@@ -1,6 +1,7 @@
 import {UCT_FACTOR} from '../../../constants/GameFixtures'
 import Game from "../../Game";
 import RandomPlayer from "../random/RandomPlayer";
+import {DRAW} from "../../../constants/GameFixtures";
 
 function addChild(nextMove, self) {
   let game = Game.fromGame(self.game);
@@ -49,7 +50,7 @@ export default class Node {
   }
 
   update(result) {
-    result === this.currentPlayer ? this.won() : this.lost();
+    result === this.currentPlayer || result === DRAW ? this.won() : this.lost();
     this.parent.update(result);
   }
 
