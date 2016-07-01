@@ -2,20 +2,6 @@ import 'whatwg-fetch';
 import StateActionValue from "./StateActionValue";
 import StateAction from "./StateAction";
 
-function _bestStateActionValue(state, possibleActions, stateActionValues, get, callback) {
-  if (possibleActions.length === 0) {
-    callback(null, stateActionValues);
-    return
-  }
-  let stateAction = new StateAction(state, possibleActions.pop());
-  if (!stateAction) debugger;
-  get(stateAction, (err, value) => {
-    if (err) callback(err);
-    stateActionValues.push(new StateActionValue(stateAction, value));
-    _bestStateActionValue(state, possibleActions, stateActionValues, get, callback)
-  })
-}
-
 export default class Experience {
   id = null;
 
@@ -42,7 +28,6 @@ export default class Experience {
 
 
   get(stateAction, callback) {
-    if (!stateAction) debugger;
     fetch('/q-learning/get/', {
       method: 'POST',
       headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
@@ -58,14 +43,19 @@ export default class Experience {
     })
   }
 
-  bestStateActionValue(state, possibleActions, isBetter, callback) {
-    let possibleActionsClone = JSON.parse(JSON.stringify(possibleActions));
-    _bestStateActionValue(state, possibleActionsClone, [], this.get, (err, stateActionValues) => {
-      if (err) callback(err);
-      let best = stateActionValues.reduce((stateActionValue, best) => {
-        return isBetter(stateActionValue.value, best.value) ? stateActionValue : best
-      }, stateActionValues[0]);
-      callback(null, best)
+  bestStateActionValue(state, possibleActions, callback) {
+    fetch('/q-learning/best', {
+      method: 'POST',
+      headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        stateActions: possibleActions.map(action => new StateAction(state, action))
+      })
+    }).then((response) => response.json()).then((json) => {
+      let parsedJson = JSON.parse(json);
+      callback(null, parsedJson.bestStateActionValue);
+    }).catch((err) => {
+      console.log('parsing failed', err);
+      callback(err)
     })
   }
 }

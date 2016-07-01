@@ -38,8 +38,9 @@ class GameContainer extends Component {
     event.preventDefault();
     let player1 = this.refs.player1.value;
     let player2 = this.refs.player2.value;
-    let trainingIterations = this.refs.trainingIterations.value;
     let isTraining = this.props.isTraining;
+    let trainingIterations = isTraining && this.refs.trainingIterations.value;
+
     this.props.startGame(player1, player2, trainingIterations, isTraining)
   }
 

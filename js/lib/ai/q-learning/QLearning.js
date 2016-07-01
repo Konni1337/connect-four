@@ -3,11 +3,6 @@ import StateActionValue from "./StateActionValue";
 import {DRAW} from "../../../constants/GameFixtures";
 import {getRandomElement} from "../../../helpers/commonHelper";
 
-
-function isBetter(v1, v2) {
-  return v1 > v2
-}
-
 function calcAlpha(self) {
   return self.dynamicAlpha ? self.alpha_0 * Math.pow(0.5, self.experience.episodes / self.e_2) : self.alpha_0;
 }
@@ -39,7 +34,7 @@ export default class QLearning {
    *          Q-Value of the best action
    */
   bestStateActionValue(state, possibleActions, callback) {
-    this.experience.bestStateActionValue(state, possibleActions, isBetter, callback)
+    this.experience.bestStateActionValue(state, possibleActions, callback)
   }
 
   selectAction(game, callback) {
@@ -49,7 +44,7 @@ export default class QLearning {
     let state = game.grid;
     let possibleActions = game.getValidMoves();
     let self = this;
-    this.bestStateActionValue(state, possibleActions, (err, bestStateActionValue) => {
+    this.experience.bestStateActionValue(state, possibleActions, (err, bestStateActionValue) => {
       if (err) throw err;
       // If this isn't the first state, then apply TD-Update
       if (self.lastStateActionValue != null) {

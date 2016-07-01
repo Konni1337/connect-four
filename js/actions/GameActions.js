@@ -69,11 +69,15 @@ export function setTrainingIterations(e) {
 }
 
 function training(player1, player2, trainingIterations, dispatch) {
-  for (let i = 0; i < trainingIterations; i++) {
-    playGame(new Game(), player1, player2, (result) => {
-      dispatch({type: END_GAME, result});
-    })
-  }
+  playGames(0, trainingIterations, player1, player2, dispatch);
+}
+
+function playGames(times, maxTimes, player1, player2, dispatch) {
+  if (times >= maxTimes) return;
+  playGame(new Game(), player1, player2, (result) => {
+    dispatch({type: END_GAME, result});
+    playGames(times + 1, maxTimes, player1, player2, dispatch)
+  })
 }
 
 function playGame(game, player1, player2, callback) {
