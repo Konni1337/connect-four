@@ -6,17 +6,9 @@ import {DRAW} from "../../../constants/GameFixtures";
  * @param {Node} node
  * @returns {Node}
  */
-function selectNodeToExplore(self) {
-  let node = self;
-  let goOn = true;
-  while (goOn) {
-    if (node.isLeaf() || !node.noMovesLeft()) {
-      goOn = false
-    } else {
-      node = node.bestChild();
-    }
-  }
-  return node;
+function selectNodeToExplore(node) {
+  if (node.isLeaf() || !node.noMovesLeft()) return node;
+  return selectNodeToExplore(node.bestChild());
 }
 
 /**
@@ -39,7 +31,7 @@ export default class Root extends Node {
   /**
    * Returns the best move
    *
-   * @returns {Move}
+   * @returns {number, number}
    */
   bestMove() {
     return this.bestChild().move;
@@ -48,10 +40,17 @@ export default class Root extends Node {
   /**
    * This start a simulation to explore the possible moves and estimate there UTC value
    */
-  exploreTree() {
-    let node = selectNodeToExplore(this);
-    let playNode = node.isLeaf() ? node : node.expand();
-    playNode.update(playNode.playRandom());
+  exploreTree(maxTime) {
+    while (Date.now() < maxTime) {
+      let node = selectNodeToExplore(this);
+      let playNode = node.isLeaf() ? node : node.expand();
+      playNode.update(playNode.playRandom());
+    }
+  }
+
+  exploreAndFind(maxMilliseconds) {
+    this.exploreTree(Date.now() + maxMilliseconds);
+    return this.bestMove();
   }
 
   /**

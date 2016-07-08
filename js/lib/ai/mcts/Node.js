@@ -90,7 +90,6 @@ export default class Node {
     } else {
       this.lost();
     }
-    // result === this.currentPlayer || result === DRAW ? this.won() : this.lost();
     this.parent.update(result);
   }
 

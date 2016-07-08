@@ -9,20 +9,14 @@ export default class RandomMCTS {
   }
 
   /**
-   * Executes the a random move
-   */
-  doBestMove() {
-    let moves = this.game.getValidMoves();
-    this.game.makeMove(getRandomElement(moves));
-  }
-
-  /**
    * Plays the given game instance randomly until it is finished
    *
    * @returns {number || DRAW}
    */
   playUntilFinished() {
-    while (!this.game.isFinished) this.doBestMove();
-    return this.game.result
+    if (this.game.isFinished) return this.game.result;
+    let moves = this.game.getValidMoves();
+    this.game.makeMove(getRandomElement(moves));
+    return this.playUntilFinished()
   }
 }
