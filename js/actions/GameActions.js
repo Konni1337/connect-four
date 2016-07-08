@@ -8,9 +8,10 @@ import {
 import MonteCarloTreeSearch from "../lib/ai/mcts/MonteCarloTreeSearch";
 import Game from "../lib/Game";
 import QLearning from '../lib/ai/q-learning/QLearning';
-import {HUMAN, MCTS, Q_LEARNING} from "../constants/GameFixtures";
+import {HUMAN, MCTS, Q_LEARNING, RANDOM} from "../constants/GameFixtures";
 import Human from "../lib/Human";
 import QLearningParams from "../lib/ai/q-learning/QLearningParams";
+import Random from "../lib/ai/random/Random";
 
 function parsePlayer(playerType, id) {
   switch (playerType) {
@@ -20,6 +21,8 @@ function parsePlayer(playerType, id) {
       return new MonteCarloTreeSearch(id);
     case Q_LEARNING:
       return new QLearning(new QLearningParams(id));
+    case RANDOM:
+      return new Random(id);
     default:
       return new Human(id);
   }
@@ -37,7 +40,7 @@ export function startGame(player1, player2, trainingIterations, isTraining) {
 
 export function makeHumanMove(move, game) {
   return dispatch => {
-    let newGame = Game.fromGame(game);
+    let newGame = game.clone();
     newGame.makeMove(move);
     dispatch({type: MAKE_MOVE, game: newGame, values: []});
     if (newGame.isFinished) {
@@ -48,7 +51,7 @@ export function makeHumanMove(move, game) {
 
 export function makeMove(game, player) {
   return dispatch => {
-    let newGame = Game.fromGame(game);
+    let newGame = game.clone();
     player.selectAction(game, (move) => {
       newGame.makeMove(move);
       dispatch({type: MAKE_MOVE, game: newGame});

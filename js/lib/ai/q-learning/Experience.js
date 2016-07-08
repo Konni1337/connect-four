@@ -2,6 +2,9 @@ import 'whatwg-fetch';
 import StateActionValue from "./StateActionValue";
 import StateAction from "./StateAction";
 
+/**
+ * This class is an interface to get and set the experience for the qLearning AI
+ */
 export default class Experience {
   id = null;
 
@@ -9,6 +12,13 @@ export default class Experience {
     this.id = id;
   }
 
+  /**
+   * Sets the state action value on the server
+   *
+   * @param stateAction
+   * @param value
+   * @param callback
+   */
   set(stateAction, value, callback) {
     fetch('/q-learning/set/', {
       method: 'POST',
@@ -26,7 +36,12 @@ export default class Experience {
     })
   }
 
-
+  /**
+   * Gets a state action value from the server
+   *
+   * @param stateAction
+   * @param callback
+   */
   get(stateAction, callback) {
     fetch('/q-learning/get/', {
       method: 'POST',
@@ -43,6 +58,13 @@ export default class Experience {
     })
   }
 
+  /**
+   * Finds the best value of an array of state actions
+   * 
+   * @param state
+   * @param possibleActions
+   * @param callback
+   */
   bestStateActionValue(state, possibleActions, callback) {
     fetch('/q-learning/best', {
       method: 'POST',

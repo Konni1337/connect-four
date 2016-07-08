@@ -1,9 +1,12 @@
-export const UCT_FACTOR = 2;
+export const UCT_FACTOR = 5;
 export const DRAW = 'draw';
 export const HUMAN = 'Human Player';
 export const MCTS = 'Monte Carlo Tree Search';
 export const Q_LEARNING = 'QLearning';
-export const PLAYER_TYPES = [HUMAN, MCTS, Q_LEARNING];
+export const RANDOM = 'Random';
+export const PLAYER_TYPES = [HUMAN, MCTS, Q_LEARNING, RANDOM];
+export const GRID_LENGTH = 5;
+export const GRID_HEIGHT = 5;
 
 export const Q_LEARNING_CONFIG = {
   DEFAULT_REWARDS: {

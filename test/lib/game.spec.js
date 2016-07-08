@@ -2,7 +2,7 @@ import expect from "expect";
 import Game from '../../js/lib/Game';
 import {DRAW} from '../../js/constants/GameFixtures'
 
-describe('getPlayerWithFourInARow', () => {
+describe('result', () => {
   it('should return -1 if there is no player with four in a row', () => {
     let game = new Game();
     game.grid = [
@@ -11,7 +11,7 @@ describe('getPlayerWithFourInARow', () => {
       [0, 0, 1, 2],
       [1, 1, 2, 2]
     ];
-    expect(game.getPlayerWithFourInARow()).toEqual(-1)
+    expect(game.findResult()).toEqual(-1)
   });
 
   it('should return DRAW if grid is full', () => {
@@ -22,7 +22,7 @@ describe('getPlayerWithFourInARow', () => {
       [2, 2, 1, 2],
       [1, 1, 2, 2]
     ];
-    expect(game.getPlayerWithFourInARow()).toEqual(DRAW)
+    expect(game.findResult()).toEqual(DRAW)
   });
 
   it('should return 1 if there are 4 in a row down right', () => {
@@ -33,7 +33,7 @@ describe('getPlayerWithFourInARow', () => {
       [2, 2, 1, 2],
       [1, 1, 2, 1]
     ];
-    expect(game.getPlayerWithFourInARow()).toEqual(1)
+    expect(game.findResult()).toEqual(1)
   });
 
   it('should return 2 if there are 4 in a row down right', () => {
@@ -44,7 +44,7 @@ describe('getPlayerWithFourInARow', () => {
       [2, 1, 2, 2],
       [2, 1, 2, 2]
     ];
-    expect(game.getPlayerWithFourInARow()).toEqual(2)
+    expect(game.findResult()).toEqual(2)
   });
 
   it('should return 1 if there are 4 in a row up right', () => {
@@ -55,7 +55,7 @@ describe('getPlayerWithFourInARow', () => {
       [0, 1, 2, 2],
       [1, 1, 2, 2]
     ];
-    expect(game.getPlayerWithFourInARow()).toEqual(1)
+    expect(game.findResult()).toEqual(1)
   });
 
   it('should return 2 if there are 4 in a row up right', () => {
@@ -66,7 +66,7 @@ describe('getPlayerWithFourInARow', () => {
       [2, 2, 2, 1],
       [2, 1, 2, 1]
     ];
-    expect(game.getPlayerWithFourInARow()).toEqual(2)
+    expect(game.findResult()).toEqual(2)
   });
 
   it('should return 1 if there are 4 in a row down', () => {
@@ -77,7 +77,7 @@ describe('getPlayerWithFourInARow', () => {
       [1, 2, 2, 1],
       [1, 1, 2, 1]
     ];
-    expect(game.getPlayerWithFourInARow()).toEqual(1)
+    expect(game.findResult()).toEqual(1)
   });
 
   it('should return 1 if there are 4 in a row down', () => {
@@ -88,7 +88,7 @@ describe('getPlayerWithFourInARow', () => {
       [2, 2, 1, 2],
       [1, 1, 1, 2]
     ];
-    expect(game.getPlayerWithFourInARow()).toEqual(1)
+    expect(game.findResult()).toEqual(1)
   });
 
   it('should return 2 if there are 4 in a row down', () => {
@@ -99,7 +99,7 @@ describe('getPlayerWithFourInARow', () => {
       [1, 2, 2, 2],
       [1, 1, 2, 2]
     ];
-    expect(game.getPlayerWithFourInARow()).toEqual(2)
+    expect(game.findResult()).toEqual(2)
   });
 
   it('should return 1 if there are 4 in a row right', () => {
@@ -110,7 +110,7 @@ describe('getPlayerWithFourInARow', () => {
       [1, 1, 1, 1],
       [1, 1, 2, 2]
     ];
-    expect(game.getPlayerWithFourInARow()).toEqual(1)
+    expect(game.findResult()).toEqual(1)
   });
 
   it('should return 1 if there are 4 in a row right', () => {
@@ -121,7 +121,7 @@ describe('getPlayerWithFourInARow', () => {
       [2, 2, 2, 0],
       [1, 1, 1, 1]
     ];
-    expect(game.getPlayerWithFourInARow()).toEqual(1)
+    expect(game.findResult()).toEqual(1)
   });
 
   it('should return 2 if there are 4 in a row right', () => {
@@ -132,6 +132,6 @@ describe('getPlayerWithFourInARow', () => {
       [1, 1, 1, 2],
       [1, 1, 2, 2]
     ];
-    expect(game.getPlayerWithFourInARow()).toEqual(2)
+    expect(game.findResult()).toEqual(2)
   });
 });

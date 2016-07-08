@@ -1,3 +1,6 @@
+/**
+ * This object represents a state action
+ */
 export default class StateAction {
   state = null;
   action = null;

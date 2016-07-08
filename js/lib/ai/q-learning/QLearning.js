@@ -7,6 +7,9 @@ function calcAlpha(self) {
   return self.dynamicAlpha ? self.alpha_0 * Math.pow(0.5, self.experience.episodes / self.e_2) : self.alpha_0;
 }
 
+/**
+ * This is a Q-Learning AI for the game connect four
+ */
 export default class QLearning {
   id = null;
 
@@ -37,9 +40,13 @@ export default class QLearning {
     this.experience.bestStateActionValue(state, possibleActions, callback)
   }
 
+  /**
+   * Selects the best action
+   * 
+   * @param game
+   * @param callback
+   */
   selectAction(game, callback) {
-
-    // TODO
     let reward = 0;
     let state = game.grid;
     let possibleActions = game.getValidMoves();
@@ -67,7 +74,7 @@ export default class QLearning {
   }
 
   /**
-   * Sets the final reward
+   * A hook that is called when the game ends. Sets the final reward.
    *
    * @param result
    */
@@ -108,6 +115,11 @@ export default class QLearning {
     }
   }
 
+  /**
+   * Returns false
+   *
+   * @returns {boolean}
+   */
   isHuman() {
     return false;
   }

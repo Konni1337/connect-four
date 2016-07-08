@@ -1,8 +1,9 @@
-import {DRAW} from "../constants/GameFixtures";
+import {DRAW, GRID_LENGTH, GRID_HEIGHT} from "../constants/GameFixtures";
 
-const GRID_LENGTH = 5;
-const GRID_HEIGHT = 5;
 
+/**
+ * This class represents a instance of a board of the game.
+ */
 export default class Game {
   constructor() {
     let grid = new Array(GRID_LENGTH);
@@ -18,15 +19,25 @@ export default class Game {
     this.currentPlayer = 1;
   }
 
-  static fromGame(game) {
+  /**
+   * Creates a copy of the current Game instance
+   *
+   * @returns {Game}
+   */
+  clone() {
     let newGame = new Game();
-    newGame.grid = JSON.parse(JSON.stringify(game.grid));
-    newGame.isFinished = game.isFinished;
-    newGame.result = game.result;
-    newGame.currentPlayer = game.currentPlayer;
+    newGame.grid = JSON.parse(JSON.stringify(this.grid));
+    newGame.isFinished = this.isFinished;
+    newGame.result = this.result;
+    newGame.currentPlayer = this.currentPlayer;
     return newGame;
   }
 
+  /**
+   * This method returns all valid moves the current player is allowed to do
+   *
+   * @returns {Array.<{number, number}>}
+   */
   getValidMoves() {
     return this.grid.reduce((moves, column, index) => {
       if (column[0] === 0) return moves.concat({index, player: this.currentPlayer});
@@ -34,18 +45,20 @@ export default class Game {
     }, [])
   }
 
+  /**
+   * Executes the given move
+   *
+   * @param move {number, number}
+   */
   makeMove(move) {
-    this.push(move)
-  }
-
-  push({index, player}) {
+    let {index, player} = move;
     let pushIndex = this.grid[index].findIndex(value => value !== 0);
     if (pushIndex === -1) {
       this.grid[index][GRID_HEIGHT - 1] = player
     } else {
       this.grid[index][pushIndex - 1] = player;
     }
-    let result = this.getPlayerWithFourInARow();
+    let result = this.findResult();
     if (result !== -1) {
       this.isFinished = true;
       this.result = result;
@@ -53,11 +66,23 @@ export default class Game {
     this.currentPlayer === 1 ? this.currentPlayer = 2 : this.currentPlayer = 1;
   }
 
+  /**
+   * Returns true if all columns are full.
+   *
+   * @returns {boolean}
+   */
   isFull() {
     return this.grid.every(column => column[0] !== 0);
   }
 
-  getPlayerWithFourInARow() {
+  /**
+   * Tries to find a player that has four stones in a row. Returns the player ID that has four in a row.#
+   * If the grid is full it returns DRAW.
+   * If none is found it returns -1.
+   *
+   * @returns {number}
+   */
+  findResult() {
     let grid = this.grid;
     let finishedPlayer = -1;
     for (let x = 0; x < grid.length; x++) {

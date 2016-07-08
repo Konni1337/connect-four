@@ -1,6 +1,9 @@
 import {Q_LEARNING_CONFIG as config} from '../../../constants/GameFixtures'
 import Experience from "./Experience";
 
+/**
+ * This class represents a config for the Q-Learning AI
+ */
 export default class QLearningParams {
   id = null;
   rewards = config.DEFAULT_REWARDS;
