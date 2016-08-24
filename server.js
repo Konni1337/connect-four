@@ -3,30 +3,41 @@ var webpack = require('webpack');
 var express = require('express');
 var config = require('./webpack.config');
 var levelup = require('levelup');
-var db = levelup('./db');
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
 
 var app = express();
 var compiler = webpack(config);
 
 var INITIAL_QVALUE = 0.5;
+var dbMap = {};
 
-function getValue(stateAction, callback) {
-  db.get(stateActionToString(stateAction), function (err, value) {
-    callback(err ? INITIAL_QVALUE : value);
+function db(id) {
+  var db = dbMap[id];
+  if (db) {
+    return db
+  } else {
+    var newDb = levelup('./db/' + id + '/');
+    dbMap[id] = newDb;
+    return newDb;
+  }
+}
+
+function getValue(id, stateAction, callback) {
+  db(id).get(stateActionToString(stateAction), function (err, value) {
+    callback(err || !value ? INITIAL_QVALUE : value);
   });
 }
 
-function getAll(stateActions = [], callback) {
-  _getAll(stateActions, [], callback)
+function getAll(id, stateActions = [], callback) {
+  _getAll(id, stateActions, [], callback)
 }
 
-function _getAll(stateActions, stateActionValues, callback) {
+function _getAll(id, stateActions, stateActionValues, callback) {
   if (stateActions.length === 0) return callback(stateActionValues);
   let stateAction = stateActions.pop();
-  getValue(stateAction, function (value) {
+  getValue(id, stateAction, function (value) {
     stateActionValues.push({stateAction: stateAction, value: value});
-    _getAll(stateActions, stateActionValues, callback)
+    _getAll(id, stateActions, stateActionValues, callback)
   })
 }
 
@@ -52,7 +63,7 @@ app.post('/q-learning/get', function (req, res) {
   let body = req.body;
   let stateAction = body.stateAction;
   if (stateAction) {
-    getValue(stateAction, function (value) {
+    getValue(body.id, stateAction, function (value) {
       res.status(200).json(JSON.stringify({value: value}));
     })
   } else {
@@ -65,7 +76,7 @@ app.post('/q-learning/best', function (req, res) {
   let body = req.body;
   let stateActions = body.stateActions;
   if (stateActions && stateActions.length > 0) {
-    getAll(stateActions, function (stateActionValues) {
+    getAll(body.id, stateActions, function (stateActionValues) {
       let best = null;
       stateActionValues.forEach(function (stateActionValue) {
         if (!best || best.value < stateActionValue.value) best = stateActionValue
@@ -82,11 +93,16 @@ app.post('/q-learning/set', function (req, res) {
   let stateAction = body.stateAction;
   let value = body.value;
   if (stateAction && !isNaN(value)) {
-    db.put(stateActionToString(stateAction), value, function (err) {
+    // console.log(stateActionToString(stateAction));
+    // if (stateActionToString(stateAction) === '') {
+    //   console.log(stateAction)
+    // }
+    db(body.id).put(stateActionToString(stateAction), value, function (err) {
       if (err) {
+        console.error(err);
         res.status(500).send('could not save data');
       } else {
-        console.log("set value " + value);
+        console.log(body.id + " set value " + value);
         res.status(200).send();
       }
     });
@@ -105,9 +121,26 @@ app.listen(3000, 'localhost', function (err, result) {
 });
 
 
+function stateForPlayer(grid, playerId) {
+  const stateArray = [];
+  for (let y = grid[0].length - 1; y >= 0; y--) {
+    for (let x = 0; x < grid.length; x++) {
+      if (grid[x][y] === playerId) stateArray.push(x + 1);
+    }
+  }
+  return stateArray;
+}
+
 function stateActionToString(stateAction) {
-  var stateString = stateAction.state.reduce(function (a, b) {
-    return a.concat(b);
-  }, []).join('');
-  return stateString + stateAction.action.index + stateAction.action.player
+  let grid = stateAction.state; // 2D grid array
+  const player1State = stateForPlayer(grid, 1);
+  const player2State = stateForPlayer(grid, 2);
+  let stateString = player1State.reduce(function (stateString, value, index) {
+    if (player2State.length === index) {
+      return stateString + value;
+    } else {
+      return stateString + value + player2State[index];
+    }
+  }, '');
+  return stateString + '.' + stateAction.action.index;
 }

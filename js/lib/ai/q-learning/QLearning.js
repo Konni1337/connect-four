@@ -4,7 +4,7 @@ import {DRAW} from "../../../constants/GameFixtures";
 import {getRandomElement} from "../../../helpers/commonHelper";
 
 function calcAlpha(self) {
-  return self.dynamicAlpha ? self.alpha_0 * Math.pow(0.5, self.experience.episodes / self.e_2) : self.alpha_0;
+  return self.dynamicAlpha ? self.alpha_0 * Math.pow(0.5, self.episodes / self.e_2) : self.alpha_0;
 }
 
 /**
@@ -22,8 +22,10 @@ export default class QLearning {
     this.epsilon = params.epsilon;
     this.dynamicAlpha = params.dynamicAlpha;
     this.e_2 = params.e_2;
+    this.episodes = 0;
     this.alpha = calcAlpha(this);
     this.lastStateActionValue = null;
+
   }
 
 
@@ -82,11 +84,11 @@ export default class QLearning {
     let self = this;
     let reward = result === DRAW ? this.rewards.draw : result === this.id ? this.rewards.won : this.rewards.lost;
     let value = parseFloat(this.lastStateActionValue.value + this.alpha * (reward - this.lastStateActionValue.value));
-
+    console.log(this.id + ': ' + result + ' gets reward ' + reward);
     this.experience.set(this.lastStateActionValue.stateAction, value, (err) => {
       if (err) throw err;
       self.lastStateActionValue = null;
-      self.experience.episodes += 1;
+      self.episodes += 1;
       self.alpha = calcAlpha(self);
     });
   }
@@ -103,7 +105,7 @@ export default class QLearning {
   applyEpsilonGreedy(bestStateActionValue, possibleActions, self, callback) {
     if (Math.random() < this.epsilon) {
       let action = getRandomElement(possibleActions);
-      if (!action) debugger;
+      if (!action) throw 'no action';
       let state = bestStateActionValue.stateAction.state;
       let stateAction = new StateAction(state, action);
       self.experience.get(stateAction, (err, value) => {

@@ -25,7 +25,8 @@ export default class Experience {
       headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
       body: JSON.stringify({
         stateAction: stateAction,
-        value: value
+        value: value,
+        id: this.id
       })
     }).then((response) => {
       if (response.status !== 200) throw 'could not save data';
@@ -47,7 +48,8 @@ export default class Experience {
       method: 'POST',
       headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
       body: JSON.stringify({
-        stateAction: stateAction
+        stateAction: stateAction,
+        id: this.id
       })
     }).then((response) => response.json()).then((json) => {
       let parsedJson = JSON.parse(json);
@@ -70,7 +72,8 @@ export default class Experience {
       method: 'POST',
       headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
       body: JSON.stringify({
-        stateActions: possibleActions.map(action => new StateAction(state, action))
+        stateActions: possibleActions.map(action => new StateAction(state, action)),
+        id: this.id
       })
     }).then((response) => response.json()).then((json) => {
       let parsedJson = JSON.parse(json);

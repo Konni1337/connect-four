@@ -12,6 +12,7 @@ import {HUMAN, MCTS, Q_LEARNING, RANDOM} from "../constants/GameFixtures";
 import Human from "../lib/Human";
 import QLearningParams from "../lib/ai/q-learning/QLearningParams";
 import Random from "../lib/ai/random/Random";
+import Experience from "../lib/ai/q-learning/Experience";
 
 function parsePlayer(playerType, id) {
   switch (playerType) {
@@ -20,7 +21,7 @@ function parsePlayer(playerType, id) {
     case MCTS:
       return new MonteCarloTreeSearch(id);
     case Q_LEARNING:
-      return new QLearning(new QLearningParams(id));
+      return new QLearning(new QLearningParams(id, {experience: new Experience(id)}));
     case RANDOM:
       return new Random(id);
     default:

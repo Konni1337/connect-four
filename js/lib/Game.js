@@ -1,4 +1,4 @@
-import {DRAW, GRID_LENGTH, GRID_HEIGHT} from "../constants/GameFixtures";
+import {DRAW, GRID_LENGTH, GRID_HEIGHT, EMPTY_VALUE} from "../constants/GameFixtures";
 
 
 /**
@@ -88,7 +88,7 @@ export default class Game {
     for (let x = 0; x < grid.length; x++) {
       for (let y = 0; y < grid[x].length; y++) {
         let player = grid[x][y];
-        if (player !== 0) {
+        if (player !== EMPTY_VALUE) {
           let downRight = x <= grid.length - 4
             && y <= grid[x].length - 4
             && grid[x + 1][y + 1] === player

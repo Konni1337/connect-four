@@ -17,6 +17,7 @@ export default class MonteCarloTreeSearch {
    */
   selectAction(game, callback) {
     this.bestAction = new Root(game).exploreAndFind(this.maxMilliseconds);
+    console.log(this.bestAction);
     return callback(this.bestAction);
   }
 
