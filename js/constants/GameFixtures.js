@@ -5,9 +5,13 @@ export const MCTS = 'Monte Carlo Tree Search';
 export const Q_LEARNING = 'QLearning';
 export const RANDOM = 'Random';
 export const PLAYER_TYPES = [HUMAN, MCTS, Q_LEARNING, RANDOM];
+export const PLAYER_TYPES_FOR_TRAINING = [MCTS, Q_LEARNING, RANDOM];
 export const GRID_LENGTH = 5;
 export const GRID_HEIGHT = 5;
 export const EMPTY_VALUE = 0;
+export const GAME_TYPE_NORMAL = 'normal';
+export const GAME_TYPE_TRAINING = 'training';
+export const GAME_TYPE_NONE = 'none';
 
 export const Q_LEARNING_CONFIG = {
   DEFAULT_REWARDS: {

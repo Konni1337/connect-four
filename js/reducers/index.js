@@ -1,47 +1,37 @@
 import {combineReducers} from "redux";
-import {MAKE_MOVE, END_GAME, START_GAME} from "../constants/gameActionTypes";
-import Game from "../lib/Game";
-import QLearning from "../lib/ai/q-learning/QLearning";
-import {TOGGLE_IS_TRAINING} from "../constants/gameActionTypes";
-import {SET_TRAINING_ITERATIONS} from "../constants/gameActionTypes";
+import* as ActionTypes from "../constants/gameActionTypes";
+import {GAME_TYPE_NONE} from "../constants/GameFixtures";
 
-function game(state = new Game(), action) {
+function game(state = {}, action) {
   switch (action.type) {
-    case MAKE_MOVE:
+    case ActionTypes.MAKE_MOVE:
+    case ActionTypes.UPDATE_GAME:
       return action.game;
-    case END_GAME:
-    case START_GAME:
-      return new Game();
-    default:
-      return state;
-  }
-}
-
-function players(state = {}, action) {
-  switch (action.type) {
-    case END_GAME:
-      state.player1 && state.player1.endGame(action.result);
-      state.player2 && state.player2.endGame(action.result);
+    case ActionTypes.GAME_END:
       return {};
-    case START_GAME:
-      return {player1: action.player1, player2: action.player2};
     default:
       return state;
   }
 }
 
-let defaultStatistics = {
-  draw: 0,
-  1: 0,
-  2: 0
-};
-
-function statistics(state = defaultStatistics, action) {
+function training(state = {}, action) {
   switch (action.type) {
-    case END_GAME:
-      let newState = Object.assign({}, state);
-      newState[action.result]++;
-      return newState;
+    case ActionTypes.TRAINING_START:
+      return action.game;
+    case ActionTypes.TRAINING_END:
+      return null;
+    default:
+      return state;
+  }
+}
+
+function statistics(state = {}, action) {
+  switch (action.type) {
+    case ActionTypes.TRAINING_START:
+    case ActionTypes.UPDATE_GAME:
+      return action.statistics;
+    case ActionTypes.UPDATE_STATISTICS:
+      return action.statistics;
     default:
       return state;
   }
@@ -49,10 +39,8 @@ function statistics(state = defaultStatistics, action) {
 
 function isStarted(state = false, action) {
   switch (action.type) {
-    case START_GAME:
-      return true;
-    case END_GAME:
-      return false;
+    case ActionTypes.UPDATE_GAME:
+      return !action.game.isFinished;
     default:
       return state;
   }
@@ -60,28 +48,54 @@ function isStarted(state = false, action) {
 
 function trainingIterations(state = 0, action) {
   switch (action.type) {
-    case SET_TRAINING_ITERATIONS:
+    case ActionTypes.CHANGE_TRAINING_ITERATIONS:
       return action.trainingIterations;
     default:
       return state;
   }
 }
 
-function isTraining(state = false, action) {
+function gameType(state = GAME_TYPE_NONE, action) {
   switch (action.type) {
-    case TOGGLE_IS_TRAINING:
-      return action.isTraining;
+    case ActionTypes.UPDATE_GAME:
+      if(action.game.isFinished) return GAME_TYPE_NONE;
+      return state;
+    case ActionTypes.CHANGE_GAME_TYPE:
+      return action.gameType;
     default:
       return state;
   }
 }
 
+function isLoading(state = false, action) {
+  switch (action.type) {
+    case ActionTypes.START_REQUEST:
+      return true;
+    case ActionTypes.END_REQUEST:
+      return false;
+    default:
+      return state
+  }
+}
+
+function error(state = {}, action) {
+  switch (action.type) {
+    case ActionTypes.CLOSE_ERROR:
+      return {};
+    case ActionTypes.ERROR:
+      return action.error;
+    default:
+      return state
+  }
+}
 
 export default combineReducers({
   game,
-  players,
+  error,
   statistics,
   isStarted,
-  isTraining,
-  trainingIterations
-}) 
+  isLoading,
+  gameType,
+  trainingIterations,
+  training
+})

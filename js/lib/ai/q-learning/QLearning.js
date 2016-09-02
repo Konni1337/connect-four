@@ -2,6 +2,7 @@ import StateAction from "./StateAction";
 import StateActionValue from "./StateActionValue";
 import {DRAW} from "../../../constants/GameFixtures";
 import {getRandomElement} from "../../../helpers/commonHelper";
+import QLearningParams from './QLearningParams'
 
 function calcAlpha(self) {
   return self.dynamicAlpha ? self.alpha_0 * Math.pow(0.5, self.episodes / self.e_2) : self.alpha_0;
@@ -14,18 +15,18 @@ export default class QLearning {
   id = null;
 
   constructor(params) {
+    let defaultParams = new QLearningParams(params.id);
     this.id = params.id;
-    this.rewards = params.rewards;
-    this.experience = params.experience;
-    this.alpha_0 = params.alpha_0;
-    this.gamma = params.gamma;
-    this.epsilon = params.epsilon;
-    this.dynamicAlpha = params.dynamicAlpha;
-    this.e_2 = params.e_2;
+    this.rewards = params.rewards || defaultParams.rewards;
+    this.experience = params.experience || defaultParams.experience;
+    this.alpha_0 = params.alpha_0 || defaultParams.alpha_0;
+    this.gamma = params.gamma || defaultParams.gamma;
+    this.epsilon = params.epsilon || defaultParams.epsilon;
+    this.dynamicAlpha = params.dynamicAlpha || defaultParams.dynamicAlpha;
+    this.e_2 = params.e_2 || defaultParams.e_2;
     this.episodes = 0;
     this.alpha = calcAlpha(this);
     this.lastStateActionValue = null;
-
   }
 
 
@@ -58,8 +59,9 @@ export default class QLearning {
       // If this isn't the first state, then apply TD-Update
       if (self.lastStateActionValue != null) {
         let tdError = reward + self.gamma * bestStateActionValue.value - self.lastStateActionValue.value;
+
         let value = parseFloat(self.lastStateActionValue.value) + self.alpha * tdError;
-        this.experience.set(self.lastStateActionValue.stateAction, value, (err) => {
+        this.experience.setValue(self.lastStateActionValue.stateAction, value, (err) => {
           if (err) throw err;
           self.applyEpsilonGreedy(bestStateActionValue, possibleActions, self, (stateActionValue) => {
             self.lastStateActionValue = stateActionValue;
@@ -85,7 +87,7 @@ export default class QLearning {
     let reward = result === DRAW ? this.rewards.draw : result === this.id ? this.rewards.won : this.rewards.lost;
     let value = parseFloat(this.lastStateActionValue.value + this.alpha * (reward - this.lastStateActionValue.value));
     console.log(this.id + ': ' + result + ' gets reward ' + reward);
-    this.experience.set(this.lastStateActionValue.stateAction, value, (err) => {
+    this.experience.setValue(this.lastStateActionValue.stateAction, value, (err) => {
       if (err) throw err;
       self.lastStateActionValue = null;
       self.episodes += 1;
@@ -108,7 +110,7 @@ export default class QLearning {
       if (!action) throw 'no action';
       let state = bestStateActionValue.stateAction.state;
       let stateAction = new StateAction(state, action);
-      self.experience.get(stateAction, (err, value) => {
+      self.experience.getValue(stateAction, (err, value) => {
         if (err) throw err;
         callback(new StateActionValue(stateAction, value))
       });

@@ -5,7 +5,7 @@ import {DRAW, GRID_LENGTH, GRID_HEIGHT, EMPTY_VALUE} from "../constants/GameFixt
  * This class represents a instance of a board of the game.
  */
 export default class Game {
-  constructor() {
+  constructor(id) {
     let grid = new Array(GRID_LENGTH);
     for (let x = 0; x < GRID_LENGTH; x++) {
       grid[x] = [];
@@ -17,6 +17,7 @@ export default class Game {
     this.isFinished = false;
     this.result = null;
     this.currentPlayer = 1;
+    this.id = id;
   }
 
   /**
@@ -49,6 +50,7 @@ export default class Game {
    * Executes the given move
    *
    * @param move {number, number}
+   * @returns {Game}
    */
   makeMove(move) {
     let {index, player} = move;
@@ -64,6 +66,7 @@ export default class Game {
       this.result = result;
     }
     this.currentPlayer === 1 ? this.currentPlayer = 2 : this.currentPlayer = 1;
+    return this;
   }
 
   /**

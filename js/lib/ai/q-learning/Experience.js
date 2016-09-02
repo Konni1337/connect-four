@@ -1,15 +1,44 @@
 import 'whatwg-fetch';
-import StateActionValue from "./StateActionValue";
 import StateAction from "./StateAction";
+import dbLayer from '../db/dbLayer';
+
+var INITIAL_QVALUE = 0.5;
+
+
+function stateForPlayer(grid, playerId) {
+  const stateArray = [];
+  for (let y = grid[0].length - 1; y >= 0; y--) {
+    for (let x = 0; x < grid.length; x++) {
+      if (grid[x][y] === playerId) stateArray.push(x + 1);
+    }
+  }
+  return stateArray;
+}
+
+function stateActionToString(stateAction) {
+  let grid = stateAction.state; // 2D grid array
+  const player1State = stateForPlayer(grid, 1);
+  const player2State = stateForPlayer(grid, 2);
+  let stateString = player1State.reduce(function (stateString, value, index) {
+    if (player2State.length === index) {
+      return stateString + value;
+    } else {
+      return stateString + value + player2State[index];
+    }
+  }, '');
+  return stateString + '.' + stateAction.action.index;
+}
 
 /**
  * This class is an interface to get and set the experience for the qLearning AI
  */
 export default class Experience {
   id = null;
+  db = null;
 
   constructor(id) {
     this.id = id;
+    this.db = dbLayer.getDatabase(id);
   }
 
   /**
@@ -19,22 +48,12 @@ export default class Experience {
    * @param value
    * @param callback
    */
-  set(stateAction, value, callback) {
-    fetch('/q-learning/set/', {
-      method: 'POST',
-      headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        stateAction: stateAction,
-        value: value,
-        id: this.id
-      })
-    }).then((response) => {
-      if (response.status !== 200) throw 'could not save data';
-      if (callback) callback();
-    }).catch((err) => {
-      console.log('parsing failed', err);
-      if (callback) callback(err);
-    })
+  setValue(stateAction, value, callback) {
+    if (stateAction && !isNaN(value)) {
+      this.db.put(stateActionToString(stateAction), value, callback)
+    } else {
+      throw 'invalid data'
+    }
   }
 
   /**
@@ -43,44 +62,50 @@ export default class Experience {
    * @param stateAction
    * @param callback
    */
-  get(stateAction, callback) {
-    fetch('/q-learning/get/', {
-      method: 'POST',
-      headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        stateAction: stateAction,
-        id: this.id
-      })
-    }).then((response) => response.json()).then((json) => {
-      let parsedJson = JSON.parse(json);
-      callback(null, parsedJson.value);
-    }).catch((err) => {
-      console.log('parsing failed', err);
-      callback(err)
-    })
+  getValue(stateAction, callback) {
+    this.db.get(stateActionToString(stateAction), function (err, value) {
+      let newValue = err || !value ? INITIAL_QVALUE : value;
+      callback(null, newValue);
+    });
   }
 
   /**
    * Finds the best value of an array of state actions
-   * 
+   *
    * @param state
    * @param possibleActions
    * @param callback
    */
   bestStateActionValue(state, possibleActions, callback) {
-    fetch('/q-learning/best', {
-      method: 'POST',
-      headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        stateActions: possibleActions.map(action => new StateAction(state, action)),
-        id: this.id
-      })
-    }).then((response) => response.json()).then((json) => {
-      let parsedJson = JSON.parse(json);
-      callback(null, parsedJson.bestStateActionValue);
-    }).catch((err) => {
-      console.log('parsing failed', err);
-      callback(err)
-    })
+    const stateActions = possibleActions.map(action => new StateAction(state, action));
+    if (stateActions && stateActions.length > 0) {
+      this.getAll(stateActions, function (stateActionValues) {
+        let best = null;
+        stateActionValues.forEach(function (stateActionValue) {
+          if (!best || best.value < stateActionValue.value) best = stateActionValue
+        });
+        callback(null, best);
+      });
+    }
   }
+
+
+  getAll(stateActions = [], callback) {
+    let self = this;
+
+    function _getAll(stateActions, stateActionValues, callback) {
+      if (stateActions.length === 0) {
+        return callback(stateActionValues);
+      }
+      let stateAction = stateActions.pop();
+      self.getValue(stateAction, function (ignore, value) {
+        stateActionValues.push({stateAction: stateAction, value: value});
+        _getAll(stateActions, stateActionValues, callback)
+      })
+    }
+
+    _getAll(stateActions, [], callback)
+  }
+
+
 }
