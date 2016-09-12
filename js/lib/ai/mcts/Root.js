@@ -41,7 +41,7 @@ export default class Root extends Node {
    * This start a simulation to explore the possible moves and estimate there UTC value
    */
   exploreTree(maxTime) {
-    while (Date.now() < maxTime) {
+    while (new Date().getTime() < maxTime) {
       let node = selectNodeToExplore(this);
       let playNode = node.isLeaf() ? node : node.expand();
       playNode.update(playNode.playRandom());
@@ -49,7 +49,7 @@ export default class Root extends Node {
   }
 
   exploreAndFind(maxMilliseconds) {
-    this.exploreTree(Date.now() + maxMilliseconds);
+    this.exploreTree(new Date().getTime() + maxMilliseconds);
     return this.bestMove();
   }
 

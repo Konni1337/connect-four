@@ -67,7 +67,7 @@ export default class Node {
    */
   draw() {
     this.visits = this.visits + 1;
-    this.wins = this.wins + 0.5;
+    this.wins = this.wins + 0.1;
   }
 
   /**

@@ -3,6 +3,7 @@ import StateActionValue from "./StateActionValue";
 import {DRAW} from "../../../constants/GameFixtures";
 import {getRandomElement} from "../../../helpers/commonHelper";
 import QLearningParams from './QLearningParams'
+import winston from "winston";
 
 function calcAlpha(self) {
   return self.dynamicAlpha ? self.alpha_0 * Math.pow(0.5, self.episodes / self.e_2) : self.alpha_0;
@@ -29,6 +30,22 @@ export default class QLearning {
     this.lastStateActionValue = null;
   }
 
+  clone() {
+    return new QLearning({
+      id: this.id,
+      rewards: this.rewards,
+      experience: this.experience,
+      alpha_0: this.alpha_0,
+      gamma: this.gamma,
+      epsilon: this.epsilon,
+      dynamicAlpha: this.dynamicAlpha,
+      e_2: this.e_2,
+      episodes: this.episodes,
+      alpha: this.alpha,
+      lastStateActionValue: this.lastStateActionValue
+    })
+  }
+
 
   /** This method returns best known action in the given state out of the possible actions
    *
@@ -50,6 +67,8 @@ export default class QLearning {
    * @param callback
    */
   selectAction(game, callback) {
+
+
     let reward = 0;
     let state = game.grid;
     let possibleActions = game.getValidMoves();
@@ -65,13 +84,13 @@ export default class QLearning {
           if (err) throw err;
           self.applyEpsilonGreedy(bestStateActionValue, possibleActions, self, (stateActionValue) => {
             self.lastStateActionValue = stateActionValue;
-            callback(stateActionValue.stateAction.action);
+            return callback(stateActionValue.stateAction.action);
           });
         });
       } else {
         self.applyEpsilonGreedy(bestStateActionValue, possibleActions, self, (stateActionValue) => {
           self.lastStateActionValue = stateActionValue;
-          callback(stateActionValue.stateAction.action);
+          return callback(stateActionValue.stateAction.action);
         });
       }
     });
@@ -86,7 +105,7 @@ export default class QLearning {
     let self = this;
     let reward = result === DRAW ? this.rewards.draw : result === this.id ? this.rewards.won : this.rewards.lost;
     let value = parseFloat(this.lastStateActionValue.value + this.alpha * (reward - this.lastStateActionValue.value));
-    console.log(this.id + ': ' + result + ' gets reward ' + reward);
+    winston.info(this.id + ' gets reward ' + reward);
     this.experience.setValue(this.lastStateActionValue.stateAction, value, (err) => {
       if (err) throw err;
       self.lastStateActionValue = null;

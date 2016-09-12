@@ -4,9 +4,13 @@ import Root from "./Root";
  * A game AI that uses Monte Carlo Tree Search to find the best move
  */
 export default class MonteCarloTreeSearch {
-  constructor(id, maxMilliseconds = 100) {
+  constructor(id, maxMilliseconds = 1000) {
     this.id = id;
     this.maxMilliseconds = maxMilliseconds;
+  }
+
+  clone() {
+    return new MonteCarloTreeSearch(this.id, this.maxMilliseconds)
   }
 
   /**
@@ -17,7 +21,6 @@ export default class MonteCarloTreeSearch {
    */
   selectAction(game, callback) {
     this.bestAction = new Root(game).exploreAndFind(this.maxMilliseconds);
-    console.log(this.bestAction);
     return callback(this.bestAction);
   }
 

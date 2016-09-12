@@ -9,6 +9,10 @@ export default class Random {
     this.id = id;
   }
 
+  clone() {
+    return new Random(this.id)
+  }
+
   /**
    * Finds the best action by MCTS
    *
@@ -16,7 +20,7 @@ export default class Random {
    * @param callback
    */
   selectAction(game, callback) {
-    callback(getRandomElement(game.getValidMoves()));
+    return callback(getRandomElement(game.getValidMoves()));
   }
 
   /**

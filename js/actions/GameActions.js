@@ -40,6 +40,7 @@ export function startGame(gameInfo) {
         body: JSON.stringify(gameInfo)
       }).then(response => response.json())
         .then(json => {
+          json = JSON.parse(json);
           dispatch({type: ActionTypes.TRAINING_START, trainingsId: json.trainingsId, statistics: json.statistics});
           dispatch({type: ActionTypes.END_REQUEST});
         })
@@ -64,4 +65,28 @@ export function startGame(gameInfo) {
         });
     }
   }
+}
+
+export function updateTraining(trainingsId) {
+  return dispatch => {
+    dispatch({type: ActionTypes.START_REQUEST});
+    return fetch('/statistics', {
+      method: 'POST',
+      headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+      body: JSON.stringify({trainingsId})
+    }).then(response => response.json())
+      .then(json => {
+        json = JSON.parse(json);
+        dispatch({type: ActionTypes.UPDATE_TRAINING, isFinished: json.isFinished, statistics: json.statistics, trainingsId: json.trainingsId});
+        dispatch({type: ActionTypes.END_REQUEST});
+      })
+      .catch(error => {
+        dispatch({type: ActionTypes.REQUEST_ERROR, error});
+        dispatch({type: ActionTypes.END_REQUEST});
+      });
+  }
+}
+
+export function endTraining() {
+  return {type: ActionTypes.TRAINING_END}
 }

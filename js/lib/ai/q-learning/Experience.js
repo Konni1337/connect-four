@@ -1,33 +1,10 @@
 import 'whatwg-fetch';
-import StateAction from "./StateAction";
 import dbLayer from '../db/dbLayer';
+import winston from "winston";
+import stateToKeyString from "../db/stateToKeyString";
 
-var INITIAL_QVALUE = 0.5;
+var INITIAL_QVALUE = 0.0;
 
-
-function stateForPlayer(grid, playerId) {
-  const stateArray = [];
-  for (let y = grid[0].length - 1; y >= 0; y--) {
-    for (let x = 0; x < grid.length; x++) {
-      if (grid[x][y] === playerId) stateArray.push(x + 1);
-    }
-  }
-  return stateArray;
-}
-
-function stateActionToString(stateAction) {
-  let grid = stateAction.state; // 2D grid array
-  const player1State = stateForPlayer(grid, 1);
-  const player2State = stateForPlayer(grid, 2);
-  let stateString = player1State.reduce(function (stateString, value, index) {
-    if (player2State.length === index) {
-      return stateString + value;
-    } else {
-      return stateString + value + player2State[index];
-    }
-  }, '');
-  return stateString + '.' + stateAction.action.index;
-}
 
 /**
  * This class is an interface to get and set the experience for the qLearning AI
@@ -49,8 +26,9 @@ export default class Experience {
    * @param callback
    */
   setValue(stateAction, value, callback) {
+    let key = stateToKeyString(stateAction);
     if (stateAction && !isNaN(value)) {
-      this.db.put(stateActionToString(stateAction), value, callback)
+      this.db.put(key, value, callback)
     } else {
       throw 'invalid data'
     }
@@ -63,8 +41,8 @@ export default class Experience {
    * @param callback
    */
   getValue(stateAction, callback) {
-    this.db.get(stateActionToString(stateAction), function (err, value) {
-      let newValue = err || !value ? INITIAL_QVALUE : value;
+    this.db.get(stateToKeyString(stateAction), function (err, value) {
+      let newValue = err || isNaN(value) ? INITIAL_QVALUE : value;
       callback(null, newValue);
     });
   }
@@ -77,10 +55,13 @@ export default class Experience {
    * @param callback
    */
   bestStateActionValue(state, possibleActions, callback) {
-    const stateActions = possibleActions.map(action => new StateAction(state, action));
+    const stateActions = possibleActions.map(action => {
+      return {state, action}
+    });
     if (stateActions && stateActions.length > 0) {
       this.getAll(stateActions, function (stateActionValues) {
         let best = null;
+
         stateActionValues.forEach(function (stateActionValue) {
           if (!best || best.value < stateActionValue.value) best = stateActionValue
         });

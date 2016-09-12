@@ -23,7 +23,8 @@
     "redux-devtools": "^2.1.5",
     "redux-thunk": "^2.1.0",
     "style-loader": "^0.13.1",
-    "whatwg-fetch": "^0.11.0"
+    "whatwg-fetch": "^0.11.0",
+    "winston": "^2.2.0"
   },
   "devDependencies": {
     "autoprefixer": "^6.3.6",

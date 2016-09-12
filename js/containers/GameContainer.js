@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from "react";
 import {connect} from "react-redux";
 import GameStart from "./GameStart";
 import GamePlay from "./GamePlay";
-import Training from "./Training";
+import Training from "./TrainingContainer";
 import * as GameFixtures from '../constants/GameFixtures';
 import ErrorContainer from "./ErrorContainer";
 

@@ -17,9 +17,9 @@ function game(state = {}, action) {
 function training(state = {}, action) {
   switch (action.type) {
     case ActionTypes.TRAINING_START:
-      return action.game;
-    case ActionTypes.TRAINING_END:
-      return null;
+      return {trainingsId: action.trainingsId, isFinished: false};
+    case ActionTypes.UPDATE_TRAINING:
+      return {trainingsId: action.trainingsId, isFinished: action.isFinished};
     default:
       return state;
   }
@@ -29,6 +29,7 @@ function statistics(state = {}, action) {
   switch (action.type) {
     case ActionTypes.TRAINING_START:
     case ActionTypes.UPDATE_GAME:
+    case ActionTypes.UPDATE_TRAINING:
       return action.statistics;
     case ActionTypes.UPDATE_STATISTICS:
       return action.statistics;
@@ -41,12 +42,16 @@ function isStarted(state = false, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_GAME:
       return !action.game.isFinished;
+    case ActionTypes.TRAINING_START:
+      return true;
+    case ActionTypes.TRAINING_END:
+      return false;
     default:
       return state;
   }
 }
 
-function trainingIterations(state = 0, action) {
+function trainingIterations(state = 10, action) {
   switch (action.type) {
     case ActionTypes.CHANGE_TRAINING_ITERATIONS:
       return action.trainingIterations;
@@ -58,7 +63,7 @@ function trainingIterations(state = 0, action) {
 function gameType(state = GAME_TYPE_NONE, action) {
   switch (action.type) {
     case ActionTypes.UPDATE_GAME:
-      if(action.game.isFinished) return GAME_TYPE_NONE;
+      if (action.game.isFinished) return GAME_TYPE_NONE;
       return state;
     case ActionTypes.CHANGE_GAME_TYPE:
       return action.gameType;
@@ -97,5 +102,5 @@ export default combineReducers({
   isLoading,
   gameType,
   trainingIterations,
-  training
+  training,
 })

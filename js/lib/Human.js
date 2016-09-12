@@ -8,6 +8,10 @@ export default class Human {
     this.id = id;
   }
 
+  clone() {
+    return new Human(this.id)
+  }
+
   /**
    * Returns true
    *
