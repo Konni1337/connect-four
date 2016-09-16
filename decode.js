@@ -12,7 +12,7 @@
 var fs = require("fs")
 var winston = require('winston');
 winston.add(winston.transports.File, { filename: 'test.log' });
-import dbLayer from "./js/lib/ai/db/dbLayer";
+import dbLayer from "js/lib/ai/dbLayer/dbLayer";
 
 function BufferObject(buffer) {
   this.offset = 0

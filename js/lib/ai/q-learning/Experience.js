@@ -1,7 +1,7 @@
 import 'whatwg-fetch';
-import dbLayer from '../db/dbLayer';
+import dbLayer from '../dbLayer/dbLayer';
 import winston from "winston";
-import stateToKeyString from "../db/stateToKeyString";
+import stateToKeyString from "../dbLayer/stateToKeyString";
 
 var INITIAL_QVALUE = 0.0;
 
