@@ -19,7 +19,7 @@ export const Q_LEARNING_CONFIG = {
     lost: -100,
     draw: -1
   },
-  DEFAULT_EXPERIENCE: 'default',
+  DEFAULT_EXPERIENCE: 'qLearning',
   DEFAULT_ALPHA_0: 0.5,
   DEFAULT_GAMMA: 1,
   DEFAULT_EPSILON: 0.001,
