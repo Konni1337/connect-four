@@ -1,0 +1,1 @@
+export const PERF_RESULT_FOLDER = 'logs/performance/results';

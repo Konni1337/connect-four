@@ -6,7 +6,8 @@
     "build": "webpack -p --config webpack.production.js",
     "build-test": "NODE_ENV=production webpack -p --config webpack.testing.js --colors",
     "build-dev": "webpack -p",
-    "test": "cross-env NODE_ENV=test mocha --recursive --compilers js:babel-register",
+    "test": "cross-env NODE_ENV=test mocha test/* --recursive --compilers js:babel-register",
+    "perf": "cross-env NODE_ENV=test LOG_PERF=true mocha performance/* --recursive --compilers js:babel-register",
     "test:watch": "npm test -- --watch"
   },
   "dependencies": {
