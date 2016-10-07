@@ -3,11 +3,10 @@ var webpack = require('webpack');
 var express = require('express');
 var config = require('./webpack.config');
 var bodyParser = require('body-parser');
-var fs = require("fs")
+var fs = require("fs");
 import Training from "./js/lib/Training";
 import Game from "./js/lib/Game";
 import Player from "./js/lib/Player";
-import winston from 'winston';
 
 
 // import decode from './decode';
@@ -55,8 +54,7 @@ app.post('/training', (req, res) => {
   let player2 = Player.create(body.player2);
   let training = new Training(body.trainingIterations, player1, player2, id);
   training.start();
-  trainingCheck(training, res)
-  // res.status(200).json(JSON.stringify({trainingsId: id, statistics: training.statistics}));
+  trainingCheck(training, res);
 });
 
 function trainingCheck(training, res) {
@@ -94,16 +92,14 @@ app.post('/ai-move', (req, res) => {
   let id = body.gameId;
   let gameWrapper = gamesMap[id];
   let game = gameWrapper.game;
-  game.makeMove(move);
-  if (game.isFinished) {
+  if (game.makeMove(move).isFinished) {
     statistics[id][game.result] += 1;
     res.status(200).json(JSON.stringify({game, statistics: statistics[id]}));
   } else {
     let otherPlayer = gameWrapper['player' + otherPlayerId(move.player)];
     if (!otherPlayer.isHuman()) {
       otherPlayer.selectAction(game, move => {
-        game.makeMove(move);
-        if (game.isFinished) {
+        if (game.makeMove(move).isFinished) {
           otherPlayer.endGame(game.result);
           statistics[id][game.result] += 1;
         }
@@ -122,16 +118,14 @@ app.post('/move', (req, res) => {
   let id = body.gameId;
   let gameWrapper = gamesMap[id];
   let game = gameWrapper.game;
-  game.makeMove(move);
-  if (game.isFinished) {
+  if (game.makeMove(move).isFinished) {
     statistics[id][game.result] += 1;
     res.status(200).json(JSON.stringify({game, statistics: statistics[id]}));
   } else {
     let otherPlayer = gameWrapper['player' + otherPlayerId(move.player)];
     if (!otherPlayer.isHuman()) {
       otherPlayer.selectAction(game, move => {
-        game.makeMove(move);
-        if (game.isFinished) {
+        if (game.makeMove(move).isFinished) {
           otherPlayer.endGame(game.result);
           statistics[id][game.result] += 1;
         }
@@ -147,7 +141,7 @@ app.get('*', function (req, res) {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.listen(3000, 'localhost', function (err, result) {
+app.listen(3000, 'localhost', function (err) {
   if (err) console.log(err);
   console.log('Listening at localhost:3000');
 });

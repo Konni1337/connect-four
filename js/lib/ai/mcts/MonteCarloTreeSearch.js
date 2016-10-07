@@ -4,9 +4,9 @@ import Root from "./Root";
  * A game AI that uses Monte Carlo Tree Search to find the best move
  */
 export default class MonteCarloTreeSearch {
-  constructor(id, maxMilliseconds = 50) {
+  constructor(id, maxDepth = 1000) {
     this.id = id;
-    this.maxMilliseconds = maxMilliseconds;
+    this.maxDepth = maxDepth;
   }
 
   clone() {
@@ -17,31 +17,30 @@ export default class MonteCarloTreeSearch {
    * Finds the best action by MCTS
    *
    * @param game    instance of the game
-   * @param callback
+   * @param cb      callback
    */
-  selectAction(game, callback) {
-    this.bestAction = new Root(game).exploreAndFind(this.maxMilliseconds);
-    return callback(this.bestAction);
+  selectAction(game, cb) {
+    cb(this.selectActionSync(game))
   }
 
   /**
-   * Returns the values for each child
-   * Currently unused but usefull for debugging
+   * Finds the best action by MCTS
    *
-   * @returns {Array.<Number>}
+   * @param game    instance of the game
    */
-  values() {
-    return this.values;
+  selectActionSync(game) {
+    return new Root(game).exploreAndFind(this.maxDepth);
   }
 
   /**
    * A hook that is called when a game is finished
    */
-  endGame() {}
+  endGame() {
+  }
 
   /**
    * Returns false
-   * 
+   *
    * @returns {boolean}
    */
   isHuman() {

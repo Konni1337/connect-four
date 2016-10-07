@@ -1,5 +1,5 @@
 import * as ActionTypes from "../constants/gameActionTypes";
-import {GAME_TYPE_TRAINING, GAME_TYPE_NONE} from "../constants/GameFixtures";
+import {GAME_TYPE_TRAINING} from "../constants/GameFixtures";
 
 
 export function changeGameType(gameType) {
@@ -89,4 +89,8 @@ export function updateTraining(trainingsId) {
 
 export function endTraining() {
   return {type: ActionTypes.TRAINING_END}
+}
+
+export function reset() {
+  return {type: ActionTypes.RESET}
 }

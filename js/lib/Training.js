@@ -1,7 +1,6 @@
 import Game from "./Game";
-import Player from "./Player";
-import {DRAW} from "../constants/GameFixtures";
 import winston from "winston";
+
 /**
  * Plays one game and updates the result
  * @param game
@@ -13,8 +12,7 @@ import winston from "winston";
 function playGame(game, player1, player2, callback) {
   let currentPlayer = game.currentPlayer === 1 ? player1 : player2;
   return currentPlayer.selectAction(game, move => {
-    game.makeMove(move);
-    if (game.isFinished) {
+    if (game.makeMove(move).isFinished) {
       callback(game.result);
     } else {
       playGame(game, player1, player2, callback);

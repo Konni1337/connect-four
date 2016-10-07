@@ -1,31 +1,27 @@
 import Node from './Node';
 import {DRAW} from "../../../constants/GameFixtures";
+import '../../../utils/arrayExtensions'
 
 /**
  * Finds the closest child that has unexplored moves
  * @param {Node} node
- * @returns {Node}
+ * @returns {Array}
  */
 function selectNodeToExplore(node) {
-  if (node.isLeaf() || !node.noMovesLeft()) return node;
-  return selectNodeToExplore(node.bestChild());
+  let visitedNotes = [node];
+  while (!node.hasMovesLeft() && !node.isLeaf()) {
+    node = node.utcChild();
+    visitedNotes.push(node)
+  }
+  return visitedNotes;
 }
 
 /**
- * The root node of the tree for MCTS. It is a special kind of Node, it has no parent and no move
+ * The root node of the tree for MCTS. It is a special kind of Node, it has no move
  */
 export default class Root extends Node {
   constructor(game) {
-    super(game, null, null);
-  }
-
-  /**
-   * Returns true
-   *
-   * @returns {boolean}
-   */
-  isRoot() {
-    return true;
+    super(game, null);
   }
 
   /**
@@ -38,20 +34,31 @@ export default class Root extends Node {
   }
 
   /**
-   * This start a simulation to explore the possible moves and estimate there UTC value
+   * This start a simulation to explore the possible moves and estimate there UTC summedValue
    */
-  exploreTree(maxTime) {
-    // TODO maybe fix number not time?
-    while (new Date().getTime() < maxTime) {
-      let node = selectNodeToExplore(this);
+  exploreAndFind(maxDepth) {
+    for (let i = 0; i < maxDepth; i++) {
+      let visitedNotes = selectNodeToExplore(this);
+      let node = visitedNotes.last();
       let playNode = node.isLeaf() ? node : node.expand();
-      playNode.update(playNode.playRandom());
+      let result = playNode.playRandom();
+      playNode.update(result);
+      for (let i = visitedNotes.length; i > 0; i--) {
+        result = result !== DRAW ? result === 1 ? 2 : 1 : DRAW;
+        visitedNotes[i - 1].update(result);
+      }
     }
+    return this.bestMove();
   }
 
-  exploreAndFind(maxMilliseconds) {
-    this.exploreTree(new Date().getTime() + maxMilliseconds);
-    return this.bestMove();
+  bestChild() {
+    let children = this.children;
+    let highest = children[0];
+    for (let i = 1, len = children.length; i < len; i++) {
+      let child = children[i];
+      if (child.value() > highest.value()) highest = child;
+    }
+    return highest;
   }
 
   /**
@@ -59,12 +66,12 @@ export default class Root extends Node {
    * @param result
    */
   update(result) {
-    if (result === this.currentPlayer) {
-      this.won();
+    if (result === this.game.currentPlayer) {
+      this.lost();
     } else if (result === DRAW) {
       this.draw();
     } else {
-      this.lost();
+      this.won();
     }
   }
 }

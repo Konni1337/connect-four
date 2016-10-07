@@ -32,7 +32,7 @@ class GamePlay extends Component {
 
   renderColumns(column, index) {
     return <div key={index} className="column" onClick={() => this.handleColumnClick(column, index)}>
-      {column.map(this.renderCell)}
+      {column.reverse().map(this.renderCell)}
     </div>
   }
 

@@ -13,7 +13,7 @@ class TrainingContainer extends Component {
     isFinished: PropTypes.bool.isRequired,
     trainingsId: PropTypes.string.isRequired,
     updateTraining: PropTypes.func.isRequired,
-    endTraining: PropTypes.func.isRequired
+    reset: PropTypes.func.isRequired
   };
 
   handleUpdate() {
@@ -21,13 +21,13 @@ class TrainingContainer extends Component {
   }
 
   render() {
-    const {isFinished, statistics, endTraining} = this.props;
+    const {isFinished, statistics, reset} = this.props;
     return (
       <div>
         {!isFinished && <span>Training still running</span>}
         {isFinished && <span>Training is finished</span>}
         <Statistics statistics={statistics}/>
-        {isFinished && <button onClick={endTraining}>Back</button>}
+        <button onClick={reset}>Reset</button>
         <button onClick={this.handleUpdate.bind(this)}>Update Statistics</button>
       </div>
     )
@@ -42,5 +42,5 @@ export default connect(state => {
   }
 }, {
   updateTraining: GameActions.updateTraining,
-  endTraining: GameActions.endTraining
+  reset: GameActions.reset
 })(TrainingContainer)

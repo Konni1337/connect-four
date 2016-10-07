@@ -1,7 +1,6 @@
 export const MAKE_MOVE = 'MAKE_MOVE';
 export const GAME_END = 'GAME_END';
 export const UPDATE_STATISTICS = 'UPDATE_STATISTICS';
-export const TOGGLE_IS_TRAINING = 'TOGGLE_IS_TRAINING';
 export const CHANGE_TRAINING_ITERATIONS = 'CHANGE_TRAINING_ITERATIONS';
 export const UPDATE_GAME = 'UPDATE_GAME';
 export const TRAINING_END = 'TRAINING_END';
@@ -13,3 +12,4 @@ export const START_REQUEST = 'START_REQUEST';
 export const END_REQUEST = 'END_REQUEST';
 export const CLOSE_ERROR = 'CLOSE_ERROR';
 export const ERROR = 'ERROR';
+export const RESET = 'RESET';

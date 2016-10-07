@@ -94,7 +94,7 @@ function error(state = {}, action) {
   }
 }
 
-export default combineReducers({
+const appReducer = combineReducers({
   game,
   error,
   statistics,
@@ -102,5 +102,15 @@ export default combineReducers({
   isLoading,
   gameType,
   trainingIterations,
-  training,
+  training
 })
+
+const rootReducer = (state, action) => {
+  if (action.type === ActionTypes.RESET) {
+    state = undefined
+  }
+
+  return appReducer(state, action)
+};
+
+export default rootReducer;

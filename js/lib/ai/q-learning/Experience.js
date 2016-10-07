@@ -1,6 +1,5 @@
 import 'whatwg-fetch';
 import dbLayer from '../dbLayer/dbLayer';
-import winston from "winston";
 import stateToKeyString from "../dbLayer/stateToKeyString";
 
 var INITIAL_QVALUE = 0.0;
@@ -19,7 +18,7 @@ export default class Experience {
   }
 
   /**
-   * Sets the state action value on the server
+   * Sets the state action summedValue on the server
    *
    * @param stateAction
    * @param value
@@ -35,7 +34,7 @@ export default class Experience {
   }
 
   /**
-   * Gets a state action value from the server
+   * Gets a state action summedValue from the server
    *
    * @param stateAction
    * @param callback
@@ -48,7 +47,7 @@ export default class Experience {
   }
 
   /**
-   * Finds the best value of an array of state actions
+   * Finds the best summedValue of an array of state actions
    *
    * @param state
    * @param possibleActions
