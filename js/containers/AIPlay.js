@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import Statistics from "../components/Statistics";
 import * as GameActions from "../actions/GameActions";
 
-class GamePlay extends Component {
+class AIPlay extends Component {
   static propTypes = {
     grid: PropTypes.arrayOf(
       PropTypes.arrayOf(PropTypes.number.isRequired).isRequired
@@ -19,25 +19,10 @@ class GamePlay extends Component {
     makeMove: PropTypes.func.isRequired
   };
 
-  handleColumnClick(column, index) {
-    const move = {
-      gameId: this.props.gameId,
-      move: {
-        player: this.props.currentPlayer,
-        index
-      }
-    };
-    if (column[0] === 0) this.props.makeMove(move);
-  }
-
   renderColumns(column, index) {
-    return <div
-      key={index}
-      className="column"
-      style={{width: this.props.cellWidth}}
-      onClick={() => this.handleColumnClick(column, index)}>
-      {column.reverse().map(this.renderCell.bind(this))}
-    </div>
+    return <div key={index}
+                style={{width: this.props.cellWidth}}
+                className="column">{column.reverse().map(this.renderCell.bind(this))}</div>
   }
 
   renderCell(cellValue, index) {
@@ -47,11 +32,12 @@ class GamePlay extends Component {
   }
 
   render() {
-    const {grid, isFinished, statistics, gridWidth} = this.props;
+    const {grid, isFinished, statistics, makeMove, gameId, gridWidth} = this.props;
     return (
       <div>
         <Statistics statistics={statistics}/>
         {!isFinished && <div className="grid-wrapper" style={{width: gridWidth}}>{grid.map(this.renderColumns.bind(this))}</div>}
+        <button className="btn btn-primary ai-move" onClick={() => makeMove({gameId})}>Do AI Move</button>
       </div>
     )
   }
@@ -68,7 +54,7 @@ export default connect(state => {
     gridWidth: 400,
     cellWidth: 400 / grid[0].length,
     cellHeight: 400 / grid[0].length
-  };
+  }
 }, {
   makeMove: GameActions.makeMove
-})(GamePlay)
+})(AIPlay)

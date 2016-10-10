@@ -4,6 +4,7 @@ import Game from "../../../../js/lib/Game";
 import {MCTS_WIN_REWARD, MCTS_DRAW_REWARD, DRAW} from "../../../../js/constants/GameFixtures";
 import RandomMCTS from "../../../../js/lib/ai/mcts/RandomMCTS";
 import {MCTS_LOSE_REWARD} from "../../../../js/constants/GameFixtures";
+import Root from "../../../../js/lib/ai/mcts/Root";
 
 describe('Node', () => {
   const game = new Game('id');
@@ -24,6 +25,12 @@ describe('Node', () => {
     it('should not return the same instance of game', () => {
       let node = new Node(game, move);
       T.expect(node.clone().game).toNotBe(node.game);
+    });
+
+    it('should not return the same instance of parent', () => {
+      let root = new Root(game);
+      let node = new Node(game, move, root);
+      T.expect(node.clone().parent).toNotBe(node.parent);
     });
 
     it('should not return the same instance of move', () => {
@@ -123,66 +130,98 @@ describe('Node', () => {
 
   describe('update', () => {
     it('should increment visits', () => {
-      let node = new Node(game, move);
-      let spy = T.spyOn(node, 'won');
+      let root = new Root(game);
+      let rootSpy = T.spyOn(root, 'update');
+      let node = new Node(game, move, root);
+      let nodeSpy = T.spyOn(node, 'won');
       node.update(game.currentPlayer);
-      T.expect(spy).toHaveBeenCalled();
-      spy.restore();
+
+      T.expect(rootSpy.calls.length).toBe(1);
+      T.expect(nodeSpy.calls.length).toBe(1);
+      rootSpy.restore();
+      nodeSpy.restore();
     });
 
     it('should increment visits if draw', () => {
-      let node = new Node(game, move);
-      let spy = T.spyOn(node, 'draw');
+      let root = new Root(game);
+      let rootSpy = T.spyOn(root, 'update');
+      let node = new Node(game, move, root);
+      let nodeSpy = T.spyOn(node, 'draw');
       node.update(DRAW);
-      T.expect(spy).toHaveBeenCalled();
-      spy.restore();
+      T.expect(rootSpy.calls.length).toBe(1);
+      T.expect(nodeSpy.calls.length).toBe(1);
+      rootSpy.restore();
+      nodeSpy.restore();
     });
 
     it('should increment visits if lost', () => {
-      let node = new Node(game, move);
-      let spy = T.spyOn(node, 'lost');
+      let root = new Root(game);
+      let rootSpy = T.spyOn(root, 'update');
+      let node = new Node(game, move, root);
+      let nodeSpy = T.spyOn(node, 'lost');
       node.update(game.currentPlayer + 1);
-      T.expect(spy).toHaveBeenCalled();
-      spy.restore();
+      T.expect(rootSpy.calls.length).toBe(1);
+      T.expect(nodeSpy.calls.length).toBe(1);
+      rootSpy.restore();
+      nodeSpy.restore();
     });
   });
 
-  describe('playRandom', () => {
-    let node = new Node(game, move).clone();
-    let spy = T.spyOn(RandomMCTS, 'playUntilFinished');
-    node.playRandom();
-    T.expect(spy).toHaveBeenCalledWith(node.game);
-    spy.restore();
+  describe('finishRandom', () => {
+    let root = new Root(game);
+    let rootSpy = T.spyOn(root, 'update');
+    let node = new Node(game.clone(), move, root);
+    let nodeSpy = T.spyOn(RandomMCTS, 'playUntilFinished');
+    node.finishRandom();
+    T.expect(rootSpy.calls.length).toBe(1);
+    T.expect(nodeSpy).toHaveBeenCalledWith(node.game);
+    rootSpy.restore();
+    nodeSpy.restore();
   });
 
   describe('expand', () => {
     it('returns a child node that played the next move', () => {
-      let node = new Node(game.clone());
-      let nodeCompare = node.clone();
-      let move = nodeCompare.unvisitedMoves.pop();
-      nodeCompare.children = [new Node(game.clone().makeMove(move), move)];
-      node.expand();
-      T.expect(node).toEqual(nodeCompare);
+      let root = new Root(game.clone());
+      let rootCompare = root.clone();
+      let move = rootCompare.unvisitedMoves.pop();
+      rootCompare.children = [new Node(game.clone().makeMove(move), move, rootCompare)];
+      root.expand();
+      // Need to set parent to null, otherwise its not possible to check equality of circular dependency
+      root.children[0].parent = null;
+      rootCompare.children[0].parent = null;
+
+      // Equals doesn't work directly on the nodes although every instance variable has equality
+      T.expect(root.game).toEqual(rootCompare.game);
+      T.expect(root.move).toEqual(rootCompare.move);
+      T.expect(root.parent).toEqual(rootCompare.parent);
+      T.expect(root.summedValue).toEqual(rootCompare.summedValue);
+      T.expect(root.visits).toEqual(rootCompare.visits);
+      T.expect(root.children).toEqual(rootCompare.children);
+      T.expect(root.unvisitedMoves).toEqual(rootCompare.unvisitedMoves);
     });
   });
 
   describe('utcValue()', () => {
     it('should return 0 if visits, value and parent visits are 0', () => {
-      let node = new Node(game, move);
-      T.expect(node.utcValue(0)).toEqual(0);
+      let node = new Node(game, move, new Root(game));
+      T.expect(node.utcValue()).toEqual(0);
     });
 
     it('should return correct utcValue if value are 0', () => {
-      let node = new Node(game, move);
+      let root = new Root(game);
+      root.visits = 2;
+      let node = new Node(game, move, root);
       node.visits = 2;
-      T.expect(T.roundDecimal(node.utcValue(2), 9)).toEqual(0.263276885); // calculated by hand
+      T.expect(T.roundDecimal(node.utcValue(), 9)).toEqual(0.263276885); // calculated by hand
     });
 
     it('should return correct utcValue', () => {
-      let node = new Node(game, move);
+      let root = new Root(game);
+      root.visits = 2;
+      let node = new Node(game, move, root);
       node.visits = 2;
       node.summedValue = 2;
-      T.expect(T.roundDecimal(node.utcValue(2), 9)).toEqual(1.263276885); // calculated by hand
+      T.expect(T.roundDecimal(node.utcValue(), 9)).toEqual(1.263276885); // calculated by hand
     });
   });
 

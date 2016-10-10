@@ -1,8 +1,7 @@
 import 'whatwg-fetch';
 import dbLayer from '../dbLayer/dbLayer';
 import stateToKeyString from "../dbLayer/stateToKeyString";
-
-var INITIAL_QVALUE = 0.0;
+import {PERSIST, INITIAL_QVALUE} from "../../../constants/config";
 
 
 /**
@@ -15,6 +14,7 @@ export default class Experience {
   constructor(id) {
     this.id = id;
     this.db = dbLayer.getDatabase(id);
+    this.persist = process.env.NODE_ENV !== 'test' && PERSIST;
   }
 
   /**
@@ -27,7 +27,7 @@ export default class Experience {
   setValue(stateAction, value, callback) {
     let key = stateToKeyString(stateAction);
     if (stateAction && !isNaN(value)) {
-      this.db.put(key, value, callback)
+      if (this.persist) this.db.put(key, value, callback)
     } else {
       throw 'invalid data'
     }

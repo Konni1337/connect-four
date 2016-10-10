@@ -14,12 +14,12 @@ export default class Statistics extends Component {
     const {statistics} = this.props;
     return (
       <div>
-        <h3>Statistics</h3>
-        <table>
+        <h3>Points</h3>
+        <table className="table statistics-table" width="300">
           <thead>
             <tr>
-              <th>Player 1 won</th>
-              <th>Player 2 won</th>
+              <th>Player 1</th>
+              <th>Player 2</th>
               <th>Draw</th>
             </tr>
           </thead>

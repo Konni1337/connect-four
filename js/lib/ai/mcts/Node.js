@@ -2,9 +2,10 @@ import RandomMCTS from "./RandomMCTS";
 import {DRAW, MCTS_WIN_REWARD, MCTS_DRAW_REWARD, MCTS_LOSE_REWARD} from "../../../constants/GameFixtures";
 
 export default class Node {
-  constructor(game, move) {
+  constructor(game, move, parent) {
     this.game = game;
     this.move = move;
+    this.parent = parent;
     this.summedValue = 0;
     this.visits = 0;
     this.children = [];
@@ -14,6 +15,7 @@ export default class Node {
   clone() {
     let move = this.move && JSON.parse(JSON.stringify(this.move));
     let node = new Node(this.game.clone(), move);
+    node.parent = this.parent && this.parent.clone();
     node.summedValue = this.summedValue;
     node.visits = this.visits;
     node.children = this.children.map(child => child.clone());
@@ -69,7 +71,7 @@ export default class Node {
    */
   expand() {
     let nextMove = this.unvisitedMoves.pop();
-    let child = new Node(this.game.clone().makeMove(nextMove), nextMove);
+    let child = new Node(this.game.clone().makeMove(nextMove), nextMove, this);
     this.children.push(child);
     return child;
   }
@@ -87,15 +89,15 @@ export default class Node {
     } else {
       this.lost();
     }
+    this.parent.update(result);
   }
 
   /**
-   * Finishes the game with a random player
+   * Finishes the game with a random player and calls update with the result
    *
-   * @returns {number || DRAW} result of the game
    */
-  playRandom() {
-    return RandomMCTS.playUntilFinished(this.game.clone());
+  finishRandom() {
+    this.update(RandomMCTS.playUntilFinished(this.game.clone()));
   }
 
   /**
@@ -103,9 +105,9 @@ export default class Node {
    *
    * @returns {number}
    */
-  utcValue(parentVisits) {
+  utcValue() {
     // let summedValue = this.winPercentage() + 2 * UCT_FACTOR * Math.sqrt(Math.log(parentVisits) / (this.visits));
-    let value = this.value() + Math.sqrt(Math.log(parentVisits) / (5 * this.visits));
+    let value = this.value() + Math.sqrt(Math.log(this.parent.visits) / (5 * this.visits));
     return isNaN(value) ? 0 : value
   }
 
@@ -125,12 +127,19 @@ export default class Node {
    * @returns {Node}
    */
   utcChild() {
+    // this.children.reduce((bestChild, child) =>  {
+    //   return !bestChild || child.utcValue() > bestChild.utcValue() ? child : bestChild
+    // });
     let children = this.children;
     let highest = children[0];
     for (let i = 1, len = children.length; i < len; i++) {
       let child = children[i];
-      if (child.utcValue(this.visits) > highest.utcValue(this.visits)) highest = child;
+      if (child.utcValue() > highest.utcValue()) highest = child;
     }
     return highest;
+  }
+
+  shouldExplore() {
+    return this.hasMovesLeft() || this.isLeaf();
   }
 }

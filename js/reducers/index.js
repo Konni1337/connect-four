@@ -83,6 +83,15 @@ function isLoading(state = false, action) {
   }
 }
 
+function onlyAi(state = false, action) {
+  switch (action.type) {
+    case ActionTypes.CHANGE_ONLY_AI:
+      return action.onlyAi;
+    default:
+      return state
+  }
+}
+
 function error(state = {}, action) {
   switch (action.type) {
     case ActionTypes.CLOSE_ERROR:
@@ -102,8 +111,9 @@ const appReducer = combineReducers({
   isLoading,
   gameType,
   trainingIterations,
-  training
-})
+  training,
+  onlyAi
+});
 
 const rootReducer = (state, action) => {
   if (action.type === ActionTypes.RESET) {

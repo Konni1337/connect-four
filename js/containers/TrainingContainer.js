@@ -27,8 +27,8 @@ class TrainingContainer extends Component {
         {!isFinished && <span>Training still running</span>}
         {isFinished && <span>Training is finished</span>}
         <Statistics statistics={statistics}/>
-        <button onClick={reset}>Reset</button>
-        <button onClick={this.handleUpdate.bind(this)}>Update Statistics</button>
+        <button className="btn btn-default" onClick={reset}>Reset</button>
+        <button className="btn btn-default" onClick={this.handleUpdate.bind(this)}>Update Statistics</button>
       </div>
     )
   }

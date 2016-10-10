@@ -1,27 +1,13 @@
 import Node from './Node';
 import {DRAW} from "../../../constants/GameFixtures";
-import '../../../utils/arrayExtensions'
-
-/**
- * Finds the closest child that has unexplored moves
- * @param {Node} node
- * @returns {Array}
- */
-function selectNodeToExplore(node) {
-  let visitedNotes = [node];
-  while (!node.hasMovesLeft() && !node.isLeaf()) {
-    node = node.utcChild();
-    visitedNotes.push(node)
-  }
-  return visitedNotes;
-}
+import '../../../utils/arrayExtensions';
 
 /**
  * The root node of the tree for MCTS. It is a special kind of Node, it has no move
  */
 export default class Root extends Node {
   constructor(game) {
-    super(game, null);
+    super(game, null, null);
   }
 
   /**
@@ -34,20 +20,22 @@ export default class Root extends Node {
   }
 
   /**
+   * Finds the a node that should be explored depending on the utc value.
+   * @param {Node} node
+   * @returns {Node}
+   */
+  findNodeToExplore(node = this) {
+    while (!node.shouldExplore()) node = node.utcChild();
+    return node.isLeaf() ? node : node.expand();
+  }
+
+  /**
    * This start a simulation to explore the possible moves and estimate there UTC summedValue
+   *
+   * @returns {Object} move
    */
   exploreAndFind(maxDepth) {
-    for (let i = 0; i < maxDepth; i++) {
-      let visitedNotes = selectNodeToExplore(this);
-      let node = visitedNotes.last();
-      let playNode = node.isLeaf() ? node : node.expand();
-      let result = playNode.playRandom();
-      playNode.update(result);
-      for (let i = visitedNotes.length; i > 0; i--) {
-        result = result !== DRAW ? result === 1 ? 2 : 1 : DRAW;
-        visitedNotes[i - 1].update(result);
-      }
-    }
+    for (let i = 0; i < maxDepth; i++) this.findNodeToExplore().finishRandom();
     return this.bestMove();
   }
 
@@ -67,11 +55,11 @@ export default class Root extends Node {
    */
   update(result) {
     if (result === this.game.currentPlayer) {
-      this.lost();
+      this.won();
     } else if (result === DRAW) {
       this.draw();
     } else {
-      this.won();
+      this.lost();
     }
   }
 }

@@ -13,3 +13,4 @@ export const END_REQUEST = 'END_REQUEST';
 export const CLOSE_ERROR = 'CLOSE_ERROR';
 export const ERROR = 'ERROR';
 export const RESET = 'RESET';
+export const CHANGE_ONLY_AI = 'CHANGE_ONLY_AI';

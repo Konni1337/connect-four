@@ -1,5 +1,5 @@
 import * as ActionTypes from "../constants/gameActionTypes";
-import {GAME_TYPE_TRAINING} from "../constants/GameFixtures";
+import {GAME_TYPE_TRAINING, HUMAN} from "../constants/GameFixtures";
 
 
 export function changeGameType(gameType) {
@@ -45,10 +45,13 @@ export function startGame(gameInfo) {
           dispatch({type: ActionTypes.END_REQUEST});
         })
         .catch(error => {
+          console.error(error);
           dispatch({type: ActionTypes.REQUEST_ERROR, error});
           dispatch({type: ActionTypes.END_REQUEST});
         })
     } else {
+      let onlyAi = gameInfo.player1.algorithm !== HUMAN && gameInfo.player2.algorithm !== HUMAN;
+      dispatch({type: ActionTypes.CHANGE_ONLY_AI, onlyAi: onlyAi});
       return fetch('/game', {
         method: 'POST',
         headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
@@ -60,6 +63,7 @@ export function startGame(gameInfo) {
           dispatch({type: ActionTypes.END_REQUEST});
         })
         .catch(error => {
+          console.error(error);
           dispatch({type: ActionTypes.REQUEST_ERROR, error});
           dispatch({type: ActionTypes.END_REQUEST});
         });
@@ -81,6 +85,7 @@ export function updateTraining(trainingsId) {
         dispatch({type: ActionTypes.END_REQUEST});
       })
       .catch(error => {
+        console.error(error);
         dispatch({type: ActionTypes.REQUEST_ERROR, error});
         dispatch({type: ActionTypes.END_REQUEST});
       });

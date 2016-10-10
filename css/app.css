@@ -1,12 +1,29 @@
+.content {
+  margin: 50px auto;
+  text-align: center;
+}
+
+.small-form {
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.small-form button {
+  margin: 0 5px;
+}
+
+.statistics-table {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
 .column {
-    width: 45px;
     float: left;
 }
 
 .cell {
     border: 1px solid black;
     width: 100%;
-    height: 45px;
     cursor: pointer;
 }
 
@@ -26,4 +43,19 @@
     height: 45px;
     width: 45px;
     float: left;
+}
+
+.grid-wrapper {
+  margin: 0 auto;
+}
+
+.grid-wrapper:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+.ai-move {
+  margin: 10px auto;
+  display: block;
 }

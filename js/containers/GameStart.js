@@ -46,43 +46,73 @@ class GameStart extends Component {
   render() {
     const {gameType, trainingIterations, changeGameType} = this.props;
     return (
-      <div>
+      <form className="form-horizontal small-form">
         {gameType === GameFixtures.GAME_TYPE_NONE &&
-        <div>
-          <button onClick={() => changeGameType(GameFixtures.GAME_TYPE_NORMAL)}>Play Game</button>
-          <button onClick={() => changeGameType(GameFixtures.GAME_TYPE_TRAINING)}>Training</button>
-        </div>
+        <span>
+          <button className="btn btn-primary"
+                  onClick={() => changeGameType(GameFixtures.GAME_TYPE_NORMAL)}>Play Game</button>
+          <button className="btn btn-primary"
+                  onClick={() => changeGameType(GameFixtures.GAME_TYPE_TRAINING)}>Training</button>
+        </span>
         }
         {gameType === GameFixtures.GAME_TYPE_NORMAL &&
-        <div>
-          <select className="player-select" ref="player1">
-            {GameFixtures.PLAYER_TYPES.map(this.renderPlayerOption)}
-          </select>
-          <select className="player-select" ref="player2">
-            {GameFixtures.PLAYER_TYPES.map(this.renderPlayerOption)}
-          </select>
+        <div className="form-horizontal">
+          <div className="form-group">
+            <label htmlFor="player1-select" className="col-sm-2 control-label">Player 1</label>
+            <div className="col-sm-10">
+              <select id="player1-select" className="form-control player-select" ref="player1">
+                {GameFixtures.PLAYER_TYPES.map(this.renderPlayerOption)}
+              </select>
+            </div>
+          </div>
+          <div className="form-group">
+            <label htmlFor="player2-select" className="col-sm-2 control-label">Player 2</label>
+            <div className="col-sm-10">
+              <select id="player2-select" className="form-control player-select" ref="player2">
+                {GameFixtures.PLAYER_TYPES.map(this.renderPlayerOption)}
+              </select>
+            </div>
+          </div>
         </div>
         }
         {gameType === GameFixtures.GAME_TYPE_TRAINING &&
         <div>
-          <label>Traning Iterations</label>
-          <input ref="trainingIterations" type="number" value={trainingIterations}
-                 onChange={this.handleChangeTrainingIterations.bind(this)}/>
-          <select className="player-select" ref="player1">
-            {GameFixtures.PLAYER_TYPES_FOR_TRAINING.map(this.renderPlayerOption)}
-          </select>
-          <select className="player-select" ref="player2">
-            {GameFixtures.PLAYER_TYPES_FOR_TRAINING.map(this.renderPlayerOption)}
-          </select>
+          <div className="form-group">
+            <label htmlFor="trainingIterations" className="col-sm-2 control-label">Iterations</label>
+            <div className="col-sm-10">
+              <input id="trainingIterations"
+                     className="form-control"
+                     ref="trainingIterations"
+                     type="number"
+                     value={trainingIterations}
+                     onChange={this.handleChangeTrainingIterations.bind(this)}/>
+            </div>
+          </div>
+          <div className="form-group">
+            <label htmlFor="player1-select" className="col-sm-2 control-label">Player 1</label>
+            <div className="col-sm-10">
+              <select id="player1-select" className="form-control player-select" ref="player1">
+                {GameFixtures.PLAYER_TYPES_FOR_TRAINING.map(this.renderPlayerOption)}
+              </select>
+            </div>
+          </div>
+          <div className="form-group">
+            <label htmlFor="player2-select" className="col-sm-2 control-label">Player 2</label>
+            <div className="col-sm-10">
+              <select id="player2-select" className="form-control player-select" ref="player2">
+                {GameFixtures.PLAYER_TYPES_FOR_TRAINING.map(this.renderPlayerOption)}
+              </select>
+            </div>
+          </div>
         </div>
         }
         {gameType !== GameFixtures.GAME_TYPE_NONE &&
         <div>
-          <button onClick={() => changeGameType(GameFixtures.GAME_TYPE_NONE)}>Back</button>
-          <button onClick={this.handleStartGame.bind(this)}>Start Game</button>
+          <button className="btn btn-default" onClick={() => changeGameType(GameFixtures.GAME_TYPE_NONE)}>Back</button>
+          <button className="btn btn-primary" onClick={this.handleStartGame.bind(this)}>Start Game</button>
         </div>
         }
-      </div>
+      </form>
     )
   }
 }

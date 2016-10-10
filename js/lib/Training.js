@@ -1,5 +1,4 @@
 import Game from "./Game";
-import winston from "winston";
 
 /**
  * Plays one game and updates the result
@@ -28,7 +27,7 @@ export default class Training {
     this.id = id;
     this.finishedGames = 0;
     this.statistics = {draw: 0, 1: 0, 2: 0};
-    this.maxRunningGames = 10;
+    this.maxRunningGames = 1;
     this.currentRunningGames = 0;
     this.progress = 0;
   }
@@ -38,7 +37,8 @@ export default class Training {
    * Start the training session
    * @returns {Training}
    */
-  start() {
+  start(done) {
+    this.done = done;
     this.startTime = new Date().getTime();
     this.gameQueue();
   }
@@ -60,11 +60,11 @@ export default class Training {
   }
 
   logProgress() {
-    winston.info(this.startTime);
+    console.log(this.startTime);
     let elapsedTime = new Date().getTime() - this.startTime;
     let averageTime = elapsedTime / this.progress;
     let secondsRemaining = parseInt((averageTime * (100 - this.progress)) / 1000);
-    winston.info(this.progress + '% of the training finished. ~' + secondsRemaining + ' seconds remaining.');
+    console.log(this.progress + '% of the training finished. ~' + secondsRemaining + ' seconds remaining.');
   }
 
 
@@ -80,10 +80,12 @@ export default class Training {
         self.currentRunningGames += 1;
         playGame(new Game(self.id), self.player1.clone(), self.player2.clone(), self.gameFinishedCall.bind(self));
       }
+      self.done({statistics: self.statistics});
       if (!self.isFinished()) {
         self.gameQueue();
       } else {
-        self.logProgress();
+        self.done({isFinished: true});
+        // self.logProgress();
       }
     }, 100);
   }
