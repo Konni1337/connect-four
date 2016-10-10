@@ -41,10 +41,9 @@ export default class TimeMeasurement {
 }
 
 function ensureExistence(filePath) {
-  let baseName = path.basename(filePath);
   let dirName = path.dirname(filePath);
   try {
-    fs.statSync(baseName).isFile();
+    fs.statSync(filePath).isFile();
   } catch (ignore) {
     if (ensureDir(dirName)) fs.writeFileSync(filePath, '');
   }
