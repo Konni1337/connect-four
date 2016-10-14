@@ -1,5 +1,5 @@
 {
-  "name": "rummikub-ai",
+  "name": "connect-four",
   "version": "0.1.0",
   "scripts": {
     "start": "DEBUG=true nodemon server.js --exec babel-node --presets es2015,stage-2",
