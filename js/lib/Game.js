@@ -51,7 +51,7 @@ export default class Game {
   /**
    * Executes the given move
    *
-   * @param move {number, number}
+   * @param move {Object}
    * @returns {Game}
    */
   makeMove(move) {
