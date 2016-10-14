@@ -1,3 +1,5 @@
+import Game from "../../Game";
+
 export default function stateToKeyString(stateAction) {
   let grid = stateAction.state; // 2D grid array
   let result = '';
@@ -9,4 +11,14 @@ export default function stateToKeyString(stateAction) {
     }
   }
   return result + '.' + stateAction.action;
+}
+
+export function importedStateToString(state, action) {
+  let simulatedGame = new Game();
+  state.split('').forEach(index => {
+    index = parseInt(index);
+    if (isNaN(index)) throw 'index should be a int, but index is ' + index;
+    simulatedGame.makeMove({index, player: simulatedGame.currentPlayer})
+  });
+  return stateToKeyString({state: simulatedGame.grid, action});
 }

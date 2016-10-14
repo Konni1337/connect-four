@@ -1,15 +1,12 @@
-var path = require('path');
-var webpack = require('webpack');
-var express = require('express');
-var config = require('./webpack.config');
-var bodyParser = require('body-parser');
-var fs = require("fs");
-// import Training from "./js/lib/Training";
+import path from 'path';
+import webpack from 'webpack';
+import express from 'express';
+import config from './webpack.config';
+import bodyParser from 'body-parser';
 import Game from "./js/lib/Game";
-import {DRAW} from "./js/constants/GameFixtures";
 import Player from "./js/lib/Player";
-// import "./js/lib/ai/test.js";
 import threads from 'threads'
+// import decode from './decode';
 
 // Set base paths to thread scripts
 threads.config.set({
@@ -19,8 +16,7 @@ threads.config.set({
   }
 });
 
-// import decode from './decode';
-// decode('ql-vs-mmmc.exp2', err => {
+// decode('/home/konstantin/Downloads/ql-vs-dtql.exp2', err => {
 //   if (err) winston.error(err);
 //   winston.info('finished');
 // });
@@ -30,10 +26,8 @@ var compiler = webpack(config);
 
 const DEFAULT_STATISTICS = {draw: 0, 1: 0, 2: 0};
 
-let trainingsMap = {};
 let gamesMap = {};
 let statisticsMap = {};
-
 
 app.use(bodyParser.json());
 app.use(require('webpack-dev-middleware')(compiler, {
