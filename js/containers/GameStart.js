@@ -71,7 +71,8 @@ class GameStart extends Component {
               <input id="player1-id"
                      className="form-control"
                      ref="player1Id"
-                     type="text"/>
+                     type="text"
+                     required/>
             </div>
           </div>
           <div className="form-group">
@@ -88,7 +89,8 @@ class GameStart extends Component {
               <input id="player2-id"
                      className="form-control"
                      ref="player2Id"
-                     type="text"/>
+                     type="text"
+                     required/>
             </div>
           </div>
         </div>
