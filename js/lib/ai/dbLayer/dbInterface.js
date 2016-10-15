@@ -1,23 +1,24 @@
 import threads from 'threads';
 import winston from 'winston';
+
 threads.config.set({
   basepath: {
     browser: 'http://localhost:3000/static/worker',
     node: __dirname + '/../../worker'
   }
 });
-const dbWorker = threads.spawn('dbWorker.js');
 
-export default class dbInterface {
-  constructor(id) {
-    this.id = id;
+class DBInterface {
+  constructor() {
+    this.db = threads.spawn('dbWorker.js');
+    winston.info('dbWorker spawned...');
   }
 
-  get(key, callback) {
+  get(id, key, callback) {
     try {
       return new Promise((resolve, reject) => {
-        dbWorker
-          .send({id: this.id, method: 'get', args: {key}})
+        this.db
+          .send({id: id, method: 'get', args: {key}})
           .on('done', message => resolve(null, message.value))
           .on('error', err => reject(err));
       }).then(value => {
@@ -29,16 +30,17 @@ export default class dbInterface {
     }
   }
 
-  set(key, value, callback) {
+  set(id, key, value, callback) {
     return new Promise((resolve, reject) => {
-      dbWorker
-        .send({id: this.id, method: 'set', args: {key, value}})
+      this.db
+        .send({id: id, method: 'set', args: {key, value}})
         .on('done', message => resolve())
         .on('error', err => reject(err));
     }).then(callback)
       .catch(callback);
   }
 }
-
+const dbInterface = new DBInterface();
+export default dbInterface;
 
 

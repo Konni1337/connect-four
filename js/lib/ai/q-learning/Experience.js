@@ -11,7 +11,7 @@ import dbInterface from "../dbLayer/dbInterface";
 export default class Experience {
   constructor(id) {
     this.id = id;
-    this.db = new dbInterface(id);
+    this.db = dbInterface;
     this.persist = process.env.NODE_ENV !== 'test' && PERSIST;
   }
 
@@ -23,16 +23,17 @@ export default class Experience {
    * @param callback
    */
   setValue(stateAction, value, callback) {
+    let self = this;
     let stringState = stateToKeyString(stateAction);
     if (stateAction && !isNaN(value)) {
       if (this.persist) {
-        this.db.put(stringState, value, callback);
-        winston.info(this.id + ' set value for state ' + stringState + ': ' + value);
+        this.db.put(self.id, stringState, value, callback);
+        winston.info(self.id + ' set value for state ' + stringState + ': ' + value);
       } else {
         callback();
       }
     } else {
-      winston.error(this.id + ' got invalid input data. METHOD: setValue; ARGS: ' + JSON.stringify(arguments, null, 2));
+      winston.error(self.id + ' got invalid input data. METHOD: setValue; ARGS: ' + JSON.stringify(arguments, null, 2));
       throw 'invalid data'
     }
   }
@@ -44,11 +45,12 @@ export default class Experience {
    * @param callback
    */
   getValue(stateAction, callback) {
+    let self = this;
     let stringState = stateToKeyString(stateAction);
-    this.db.get(stringState, function (err, value) {
-      if (err) winston.error(err, value);
+    this.db.get(self.id, stringState, function (err, value) {
+      if (err) winston.error(err);
       let newValue = err || isNaN(value) ? INITIAL_QVALUE : value;
-      winston.info(this.id + ' get value for state ' + stringState + ': ' + newValue + '(' + value + ')');
+      winston.info(self.id + ' get value for state ' + stringState + ': ' + newValue + '(' + value + ')');
       callback(null, newValue);
     });
   }
