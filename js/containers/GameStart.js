@@ -117,11 +117,31 @@ class GameStart extends Component {
             </div>
           </div>
           <div className="form-group">
+            <label htmlFor="player1-id" className="col-sm-2 control-label">ID</label>
+            <div className="col-sm-10">
+              <input id="player1-id"
+                     className="form-control"
+                     ref="player1Id"
+                     type="text"
+                     required/>
+            </div>
+          </div>
+          <div className="form-group">
             <label htmlFor="player2-select" className="col-sm-2 control-label">Player 2</label>
             <div className="col-sm-10">
               <select id="player2-select" className="form-control player-select" ref="player2">
                 {GameFixtures.PLAYER_TYPES_FOR_TRAINING.map(this.renderPlayerOption)}
               </select>
+            </div>
+          </div>
+          <div className="form-group">
+            <label htmlFor="player2-id" className="col-sm-2 control-label">ID</label>
+            <div className="col-sm-10">
+              <input id="player2-id"
+                     className="form-control"
+                     ref="player2Id"
+                     type="text"
+                     required/>
             </div>
           </div>
         </div>
