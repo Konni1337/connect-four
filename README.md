@@ -1,5 +1,5 @@
 
-# Connect Four with AI
+# Connect Four With AI
 
 This is the popular game Connect Four implemented with NodeJS and React/Redux. You can play against another Player or
 AI. There currently two different AI's in the game:
