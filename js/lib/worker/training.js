@@ -18,8 +18,8 @@ function playGame(game, player1, player2, callback) {
 module.exports = function (input, done) {
   let {iterations, body} = input;
   let id = body.gameId;
-  let player1 = Player.create(body.player1, true);
-  let player2 = Player.create(body.player2, true);
+  let player1 = Player.create(body.player1);
+  let player2 = Player.create(body.player2);
   let gamePromises = [];
   for (let i = 0; i < iterations; i++) {
     gamePromises.push(new Promise(resolve => {
