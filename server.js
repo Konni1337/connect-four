@@ -73,10 +73,10 @@ app.post('/statistics', (req, res) => {
 app.post('/training', (req, res) => {
   let body = req.body;
   let id = body.gameId;
-  let iterations = Math.floor(body.trainingIterations / 1);
+  let iterations = Math.floor(body.trainingIterations / config.THREAD_COUNT);
   statisticsMap[id] = DEFAULT_STATISTICS;
   threadMap[id] = [];
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < config.THREAD_COUNT; i++) {
     const thread = threads.spawn('root.js');
     threadMap[id].push(thread);
     thread.send({iterations, body})
