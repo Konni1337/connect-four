@@ -21,6 +21,7 @@ module.exports = function (input, done) {
   let player1 = Player.create(body.player1);
   let player2 = Player.create(body.player2);
   let gamePromises = [];
+  // TODO with batch
   for (let i = 0; i < iterations; i++) {
     gamePromises.push(new Promise(resolve => {
       playGame(new Game(id), player1, player2, result => {
