@@ -1,13 +1,13 @@
 
-# connect-four (connect-four)
+# Connect Four with AI
 
-> This is the popular game Connect Four implemented with NodeJS and React/Redux. You can play against another Player or
+This is the popular game Connect Four implemented with NodeJS and React/Redux. You can play against another Player or
 AI. There currently two different AI's in the game:
 * Q-Learning
 * Monte Carlo Tree Search
 It is also possible to start training sessions for the AI or to let two AI's play against each other.
 
-## Running your project
+## Getting Started
 
 The generated project includes a development server on port `3000`, which will rebuild the app whenever you change application code. To start the server (with the dev-tools enabled), run:
 
