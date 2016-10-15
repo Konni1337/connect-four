@@ -1,19 +1,17 @@
 import 'whatwg-fetch';
-import dbLayer from '../dbLayer/dbLayer';
+import winston from '../../logger/QLearningLogger';
 import stateToKeyString from "../dbLayer/stateToKeyString";
 import {PERSIST, INITIAL_QVALUE} from "../../../constants/config";
-
+import {getRandomElement} from "../../../helpers/CommonHelper";
+import dbInterface from "../dbLayer/dbInterface";
 
 /**
  * This class is an interface to get and set the experience for the qLearning AI
  */
 export default class Experience {
-  id = null;
-  db = null;
-
   constructor(id) {
     this.id = id;
-    this.db = dbLayer.getDatabase(id);
+    this.db = new dbInterface(id);
     this.persist = process.env.NODE_ENV !== 'test' && PERSIST;
   }
 
@@ -25,10 +23,16 @@ export default class Experience {
    * @param callback
    */
   setValue(stateAction, value, callback) {
-    let key = stateToKeyString(stateAction);
+    let stringState = stateToKeyString(stateAction);
     if (stateAction && !isNaN(value)) {
-      if (this.persist) this.db.put(key, value, callback)
+      if (this.persist) {
+        this.db.put(stringState, value, callback);
+        winston.info(this.id + ' set value for state ' + stringState + ': ' + value);
+      } else {
+        callback();
+      }
     } else {
+      winston.error(this.id + ' got invalid input data. METHOD: setValue; ARGS: ' + JSON.stringify(arguments, null, 2));
       throw 'invalid data'
     }
   }
@@ -40,8 +44,11 @@ export default class Experience {
    * @param callback
    */
   getValue(stateAction, callback) {
-    this.db.get(stateToKeyString(stateAction), function (err, value) {
+    let stringState = stateToKeyString(stateAction);
+    this.db.get(stringState, function (err, value) {
+      if (err) winston.error(err, value);
       let newValue = err || isNaN(value) ? INITIAL_QVALUE : value;
+      winston.info(this.id + ' get value for state ' + stringState + ': ' + newValue + '(' + value + ')');
       callback(null, newValue);
     });
   }
@@ -57,15 +64,23 @@ export default class Experience {
     const stateActions = possibleActions.map(action => {
       return {state, action}
     });
+
     if (stateActions && stateActions.length > 0) {
       this.getAll(stateActions, function (stateActionValues) {
-        let best = null;
+        let best = [];
 
         stateActionValues.forEach(function (stateActionValue) {
-          if (!best || best.value < stateActionValue.value) best = stateActionValue
+          if (best.length === 0 || best[0].value === stateActionValue.value) {
+            best.push(stateActionValue)
+          } else if (best[0].value < stateActionValue.value) {
+            best = [stateActionValue];
+          }
         });
-        callback(null, best);
+        callback(null, getRandomElement(best));
       });
+    } else {
+      winston.error(this.id + ' never should be able to get here. METHOD: bestStateActionValue; ARGS: ' + JSON.stringify(arguments, null, 2));
+      throw "shouldn't be able get here"
     }
   }
 

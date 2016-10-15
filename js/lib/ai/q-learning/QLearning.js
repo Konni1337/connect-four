@@ -1,9 +1,10 @@
 import StateAction from "./StateAction";
 import StateActionValue from "./StateActionValue";
 import {DRAW} from "../../../constants/GameFixtures";
-import {getRandomElement} from "../../../helpers/commonHelper";
+import {getRandomElement} from "../../../helpers/CommonHelper";
 import QLearningParams from './QLearningParams'
 import winston from "winston";
+
 
 function calcAlpha(self) {
   return self.dynamicAlpha ? self.alpha_0 * Math.pow(0.5, self.episodes / self.e_2) : self.alpha_0;
@@ -62,13 +63,11 @@ export default class QLearning {
 
   /**
    * Selects the best action
-   * 
+   *
    * @param game
    * @param callback
    */
   selectAction(game, callback) {
-
-
     let reward = 0;
     let state = game.grid;
     let possibleActions = game.getValidMoves();
@@ -84,12 +83,14 @@ export default class QLearning {
           if (err) throw err;
           self.applyEpsilonGreedy(bestStateActionValue, possibleActions, self, (stateActionValue) => {
             self.lastStateActionValue = stateActionValue;
+            winston.info(this.id + ' found best action: ' + JSON.stringify(stateActionValue.stateAction.action, null, 2));
             return callback(stateActionValue.stateAction.action);
           });
         });
       } else {
         self.applyEpsilonGreedy(bestStateActionValue, possibleActions, self, (stateActionValue) => {
           self.lastStateActionValue = stateActionValue;
+          winston.info(this.id + ' found best action: ' + JSON.stringify(stateActionValue.stateAction.action, null, 2));
           return callback(stateActionValue.stateAction.action);
         });
       }
@@ -126,7 +127,10 @@ export default class QLearning {
   applyEpsilonGreedy(bestStateActionValue, possibleActions, self, callback) {
     if (Math.random() < this.epsilon) {
       let action = getRandomElement(possibleActions);
-      if (!action) throw 'no action';
+      if (!action) {
+        winston.error(this.id + ' applyEpsilonGreedy got empty possibleActions. Should not be possible.');
+        throw 'no action';
+      }
       let state = bestStateActionValue.stateAction.state;
       let stateAction = new StateAction(state, action);
       self.experience.getValue(stateAction, (err, value) => {

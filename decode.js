@@ -13,7 +13,7 @@ import fs from "fs";
 import winston from 'winston';
 import dbLayer from "./js/lib/ai/dbLayer/dbLayer";
 import {importedStateToString} from './js/lib/ai/dbLayer/stateToKeyString';
-winston.add(winston.transports.File, {filename: 'test.log'});
+
 
 function BufferObject(buffer) {
   this.offset = 0;
@@ -99,8 +99,15 @@ function loadData(fileName, callback, progress) {
         let state = buff.readString();
         let action = buff.readUInt32BE();
         let value = buff.readDoubleBE();
-
-        data.experience.push({type: 'put', key: importedStateToString(state, action), value});
+        let stringState = importedStateToString(state, action);
+        // if (state.length === 1) {
+        //   winston.info('state: ' + state + ' action: ' + action);
+        //   winston.info('state: ' + state);
+        //   winston.info('action: ' + action);
+        //   winston.info('value: ' + value);
+        //   winston.info('stringState: ' + stringState);
+        // }
+        data.experience.push({type: 'put', key: stringState, value});
       }
 
       let loadedEntries = i + offset;

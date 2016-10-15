@@ -1,4 +1,4 @@
-import {getRandomElement} from "../../../helpers/commonHelper";
+import {getRandomElement} from "../../../helpers/CommonHelper";
 import Game from '../../Game';
 
 /**

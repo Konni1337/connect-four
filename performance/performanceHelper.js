@@ -1,6 +1,6 @@
 export expect from 'expect';
 import TimeMeasurement from "../js/utils/TimeMeasurement";
-import '../js/utils/arrayExtensions'
+import '../js/extensions/arrayExtensions'
 import moment from 'moment';
 
 const timeMeasurer = new TimeMeasurement(100);

@@ -1,6 +1,6 @@
 import Node from './Node';
 import {DRAW} from "../../../constants/GameFixtures";
-import '../../../utils/arrayExtensions';
+import '../../../extensions/arrayExtensions';
 
 /**
  * The root node of the tree for MCTS. It is a special kind of Node, it has no move

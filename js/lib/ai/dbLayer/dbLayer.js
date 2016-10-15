@@ -1,4 +1,4 @@
-const levelup = require('levelup');
+const level = require('level-party');
 
 class DbLayer {
   constructor() {
@@ -8,7 +8,7 @@ class DbLayer {
   getDatabase(id) {
     let db = this.dbMap[id];
     if (!db) {
-      db = levelup('./db/' + id + '/');
+      db = level('./db/' + id + '/');
       this.dbMap[id] = db;
     }
     return db;

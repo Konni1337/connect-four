@@ -106,7 +106,6 @@ export default class Node {
    * @returns {number}
    */
   utcValue() {
-    // let summedValue = this.winPercentage() + 2 * UCT_FACTOR * Math.sqrt(Math.log(parentVisits) / (this.visits));
     let value = this.value() + Math.sqrt(Math.log(this.parent.visits) / (5 * this.visits));
     return isNaN(value) ? 0 : value
   }

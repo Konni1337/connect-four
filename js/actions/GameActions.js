@@ -43,6 +43,7 @@ export function startGame(gameInfo) {
           json = JSON.parse(json);
           dispatch({type: ActionTypes.TRAINING_START, trainingsId: json.trainingsId, statistics: json.statistics});
           dispatch({type: ActionTypes.END_REQUEST});
+          checkUpdateLoop(dispatch, json.trainingsId);
         })
         .catch(error => {
           console.error(error);
@@ -98,4 +99,26 @@ export function endTraining() {
 
 export function reset() {
   return {type: ActionTypes.RESET}
+}
+
+function checkUpdateLoop(dispatch, trainingsId) {
+  setTimeout(function () {
+    dispatch({type: ActionTypes.START_REQUEST});
+    fetch('/statistics', {
+      method: 'POST',
+      headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+      body: JSON.stringify({trainingsId})
+    }).then(response => response.json())
+      .then(json => {
+        json = JSON.parse(json);
+        dispatch({type: ActionTypes.UPDATE_TRAINING, isFinished: json.isFinished, statistics: json.statistics, trainingsId: json.trainingsId});
+        dispatch({type: ActionTypes.END_REQUEST});
+        if (!json.isFinished) checkUpdateLoop(dispatch, trainingsId);
+      })
+      .catch(error => {
+        console.error(error);
+        dispatch({type: ActionTypes.REQUEST_ERROR, error});
+        dispatch({type: ActionTypes.END_REQUEST});
+      });
+  }, 1000);
 }

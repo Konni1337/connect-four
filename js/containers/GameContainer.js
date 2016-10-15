@@ -16,7 +16,6 @@ class GameContainer extends Component {
 
   render() {
     const {isStarted, gameType, onlyAi} = this.props;
-    console.log(isStarted && gameType === GameFixtures.GAME_TYPE_NORMAL && onlyAi);
     return (
       <div className="container content">
         <ErrorContainer />

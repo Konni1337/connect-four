@@ -1,12 +1,14 @@
 import path from 'path';
 import webpack from 'webpack';
 import express from 'express';
-import config from './webpack.config';
+import webpackConfig from './webpack.config';
+import * as config from './js/constants/config';
 import bodyParser from 'body-parser';
 import Game from "./js/lib/Game";
 import Player from "./js/lib/Player";
-import threads from 'threads'
-// import decode from './decode';
+import threads from 'threads';
+import winston from 'winston';
+import decode from './decode';
 
 // Set base paths to thread scripts
 threads.config.set({
@@ -16,34 +18,53 @@ threads.config.set({
   }
 });
 
-// decode('/home/konstantin/Downloads/ql-vs-dtql.exp2', err => {
-//   if (err) winston.error(err);
-//   winston.info('finished');
-// });
+// Maybe load Q-Learning data
+if (config.IMPORT_ON_LOAD) {
+  decode(config.IMPORT_FILE, err => {
+    if (err) winston.error(err);
+    winston.info('finished');
+  });
+}
 
-var app = express();
-var compiler = webpack(config);
+let app = express();
+let compiler = webpack(webpackConfig);
 
 const DEFAULT_STATISTICS = {draw: 0, 1: 0, 2: 0};
 
+let threadMap = {};
 let gamesMap = {};
 let statisticsMap = {};
 
 app.use(bodyParser.json());
 app.use(require('webpack-dev-middleware')(compiler, {
   noInfo: true,
-  publicPath: config.output.publicPath,
+  publicPath: webpackConfig.output.publicPath,
   historyApiFallback: true
 }));
 
 app.use(require('webpack-hot-middleware')(compiler));
+
+app.use((req, res, next) => {
+  if (config.LOG_REQUESTS) {
+    let requestInfo = [
+      '',
+      'Incoming Request:',
+      req.method + ' ' + req.url,
+      'Request Body:',
+      JSON.stringify(req.body, null, 2),
+      ''
+    ].join('\n');
+    winston.info(requestInfo);
+  }
+  next();
+});
 
 app.post('/statistics', (req, res) => {
   let body = req.body;
   let id = body.trainingsId;
   let statistics = statisticsMap[id] || DEFAULT_STATISTICS;
   res.status(200).json(JSON.stringify({
-    isFinished: false,
+    isFinished: threadMap[id].length === 0,
     statistics: statistics,
     trainingsId: id
   }))
@@ -52,17 +73,26 @@ app.post('/statistics', (req, res) => {
 app.post('/training', (req, res) => {
   let body = req.body;
   let id = body.gameId;
-  var iterations = Math.floor(body.trainingIterations / 10);
+  let iterations = Math.floor(body.trainingIterations / 1);
   statisticsMap[id] = DEFAULT_STATISTICS;
-  for (let i = 0; i < 10; i++) {
+  threadMap[id] = [];
+  for (let i = 0; i < 1; i++) {
     const thread = threads.spawn('root.js');
+    threadMap[id].push(thread);
     thread.send({iterations, body})
       .on('done', message => {
-        console.log('worker sent message: ' + message.result);
+        winston.info('worker sent message: ' + JSON.stringify(message, null, 2));
         if (message.result) statisticsMap[id][message.result] += 1;
-        if (message.isFinished) thread.kill();
+        if (message.isFinished) {
+          threadMap[id].splice(threadMap[id].indexOf(thread), 1);
+          thread.kill();
+        }
       })
-      .on('error', error => console.error(error))
+      .on('error', error => {
+        console.error(error);
+        threadMap[id].splice(threadMap[id].indexOf(thread), 1);
+        thread.kill();
+      })
   }
   res.status(200).json(JSON.stringify({trainingsId: id, statistics: DEFAULT_STATISTICS}));
 
@@ -71,7 +101,7 @@ app.post('/training', (req, res) => {
   // let player1 = Player.create(body.player1);
   // let player2 = Player.create(body.player2);
   // let training = new Training(body.trainingIterations, player1, player2, id);
-  // res.status(200).json(JSON.stringify({trainingsId: training.id, statistics: training.statistics}));
+  // // res.status(200).json(JSON.stringify({trainingsId: training.id, statistics: training.statistics}));
   // training.start();
   // trainingCheck(training, res);
 });
@@ -141,7 +171,7 @@ app.post('/move', (req, res) => {
   }
 });
 
-app.get('*', function (req, res) {
+app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 

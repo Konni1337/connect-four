@@ -80,12 +80,12 @@ export default class Training {
         self.currentRunningGames += 1;
         playGame(new Game(self.id), self.player1.clone(), self.player2.clone(), self.gameFinishedCall.bind(self));
       }
-      self.done({statistics: self.statistics});
+      // self.done({statistics: self.statistics});
       if (!self.isFinished()) {
         self.gameQueue();
       } else {
-        self.done({isFinished: true});
-        // self.logProgress();
+        // self.done({isFinished: true});
+        self.logProgress();
       }
     }, 100);
   }
