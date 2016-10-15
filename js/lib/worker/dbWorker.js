@@ -1,11 +1,9 @@
 import dbLayer from '../ai/dbLayer/dbLayer';
-import winston from 'winston';
 
 module.exports = function(input, done) {
   let {id, method, args} = input;
 
   let db = dbLayer.getDatabase(id);
-  winston.info(db.isOpen());
   switch (method) {
     case 'get':
       db.get(args.key, function (err, value) {
