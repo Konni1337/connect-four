@@ -8,7 +8,7 @@ import Game from "./js/lib/Game";
 import Player from "./js/lib/Player";
 import threads from 'threads';
 import winston from 'winston';
-import decode from './decode';
+// import decode from './decode';
 
 // Set base paths to thread scripts
 threads.config.set({
@@ -77,7 +77,8 @@ app.post('/training', (req, res) => {
   statisticsMap[id] = DEFAULT_STATISTICS;
   threadMap[id] = [];
   for (let i = 0; i < config.THREAD_COUNT; i++) {
-    const thread = threads.spawn('root.js');
+    const thread = threads.spawn('training.js');
+    winston.info('training spawned...');
     threadMap[id].push(thread);
     thread.send({iterations, body})
       .on('done', message => {
