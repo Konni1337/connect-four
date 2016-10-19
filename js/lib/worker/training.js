@@ -1,6 +1,5 @@
 import Player from "../Player";
 import Game from "../Game";
-import winston from 'winston';
 /**
  * Plays one game and updates the result
  * @param game
@@ -15,21 +14,31 @@ function playGame(game, player1, player2, callback) {
   return currentPlayer.selectAction(game, move => playGame(game.makeMove(move), player1, player2, callback));
 }
 
+function createPromises(count, iterations, fn, callback) {
+  let promises = [];
+  for (let i = 0; i < iterations || i < 10; i++) {
+    count++;
+    promises.push(new Promise(fn));
+  }
+  Promise.all(promises).then(() => {
+    count === iterations ? callback() : createPromises(count, iterations, fn, callback)
+  });
+}
+
+
+
 module.exports = function (input, done) {
   let {iterations, body} = input;
-  let id = body.gameId;
-  let player1 = Player.create(body.player1);
-  let player2 = Player.create(body.player2);
-  let gamePromises = [];
-  // TODO with batch
-  for (let i = 0; i < iterations; i++) {
-    gamePromises.push(new Promise(resolve => {
-      playGame(new Game(id), player1, player2, result => {
-        winston.info('here');
-        done({result});
-        resolve();
-      });
-    }));
-  }
-  Promise.all(gamePromises).then(() => done({isFinished: true}));
+  let gameInfo = {
+    id: body.gameId,
+    player1: Player.create(body.player1),
+    player2: Player.create(body.player2)
+  };
+
+  createPromises(0, iterations, (resolve) => {
+    playGame(new Game(gameInfo.id), gameInfo.player1, gameInfo.player2, result => {
+      done({result});
+      resolve();
+    })
+  }, () => done({isFinished: true}));
 };

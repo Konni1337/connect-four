@@ -3,7 +3,7 @@ import winston from '../../logger/QLearningLogger';
 import stateToKeyString from "../dbLayer/stateToKeyString";
 import {PERSIST, INITIAL_QVALUE} from "../../../constants/config";
 import {getRandomElement} from "../../../helpers/CommonHelper";
-import dbInterface from "../dbLayer/dbInterface";
+import dbLayer from "../dbLayer/dbLayer";
 
 /**
  * This class is an interface to get and set the experience for the qLearning AI
@@ -11,7 +11,7 @@ import dbInterface from "../dbLayer/dbInterface";
 export default class Experience {
   constructor(id) {
     this.id = id;
-    this.db = dbInterface;
+    this.db = dbLayer.getDatabase(id);
     this.persist = process.env.NODE_ENV !== 'test' && PERSIST;
   }
 

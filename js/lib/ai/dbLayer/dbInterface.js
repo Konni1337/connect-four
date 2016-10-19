@@ -8,10 +8,12 @@ threads.config.set({
   }
 });
 
+let dbWorker = threads.spawn('dbWorker.js');
+winston.info('dbWorker spawned...');
+
 class DBInterface {
   constructor() {
-    this.db = threads.spawn('dbWorker.js');
-    winston.info('dbWorker spawned...');
+    this.db = dbWorker;
   }
 
   get(id, key, callback) {
