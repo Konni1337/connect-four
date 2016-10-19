@@ -102,9 +102,9 @@ export default class QLearning {
    *
    * @param result
    */
-  endGame(result) {
+  endGame(result, id) {
     let self = this;
-    let reward = result === DRAW ? this.rewards.draw : result === this.id ? this.rewards.won : this.rewards.lost;
+    let reward = result === DRAW ? this.rewards.draw : result === id ? this.rewards.won : this.rewards.lost;
     let value = parseFloat(this.lastStateActionValue.value + this.alpha * (reward - this.lastStateActionValue.value));
     winston.info(this.id + ' gets reward ' + reward);
     this.experience.setValue(this.lastStateActionValue.stateAction, value, (err) => {

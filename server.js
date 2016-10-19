@@ -81,8 +81,9 @@ app.post('/training', (req, res) => {
   let iterationsLeft = iterations;
   function threadIterations() {
     if (iterationsLeft < 100) {
+      let tmp = iterationsLeft;
       iterationsLeft = 0;
-      return iterationsLeft
+      return tmp;
     } else {
       iterationsLeft -= 100;
       return 100
@@ -165,7 +166,7 @@ app.post('/move', (req, res) => {
       if (!player2.isHuman()) {
         player2.selectAction(game, move => {
           if (game.makeMove(move).isFinished) {
-            player2.endGame(game.result);
+            player2.endGame(game.result, 2);
             statisticsMap[id][game.result] += 1;
           }
           res.status(200).json(JSON.stringify({game, statistics: statisticsMap[id]}));
@@ -178,8 +179,8 @@ app.post('/move', (req, res) => {
     player1.selectAction(game, move => {
       if (game.makeMove(move).isFinished) {
         let result = game.result;
-        player1.endGame(result);
-        player2.endGame(result);
+        player1.endGame(result, 1);
+        player2.endGame(result, 2);
         statisticsMap[id][result] += 1;
       }
       res.status(200).json(JSON.stringify({game, statistics: statisticsMap[id]}));

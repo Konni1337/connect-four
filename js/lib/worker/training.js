@@ -11,8 +11,8 @@ import Game from "../Game";
 function playGame(game, player1, player2, callback) {
   if (game.isFinished) {
     let result = game.result;
-    player1.endGame(result);
-    player2.endGame(result);
+    player1.endGame(result, 1);
+    player2.endGame(result, 2);
     return callback(result);
   }
   let currentPlayer = game.currentPlayer === 1 ? player1 : player2;
