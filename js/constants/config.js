@@ -1,7 +1,7 @@
 // folder where you want to save the performance results
 export const PERF_RESULT_FOLDER = 'logs/performance/results';
 // Set to true if you want to let the qlearning agent learn;
-export const PERSIST = false;
+export const PERSIST = true;
 // Value used if no q value is set for the state yet
 export const INITIAL_QVALUE = 0.0;
 // Set to true if you want to log every request made to the server

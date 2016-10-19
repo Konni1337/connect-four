@@ -28,7 +28,7 @@ export default class Experience {
     if (stateAction && !isNaN(value)) {
       if (this.persist) {
         this.db.put(self.id, stringState, value, callback);
-        winston.info(self.id + ' set value for state ' + stringState + ': ' + value);
+        // winston.info(self.id + ' set value for state ' + stringState + ': ' + value);
       } else {
         callback();
       }
@@ -50,7 +50,7 @@ export default class Experience {
     this.db.get(self.id, stringState, function (err, value) {
       if (err) winston.error(err);
       let newValue = err || isNaN(value) ? INITIAL_QVALUE : value;
-      winston.info(self.id + ' get value for state ' + stringState + ': ' + newValue + '(' + value + ')');
+      // winston.info(self.id + ' get value for state ' + stringState + ': ' + newValue + '(' + value + ')');
       callback(null, newValue);
     });
   }

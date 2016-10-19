@@ -70,23 +70,40 @@ app.post('/statistics', (req, res) => {
   }))
 });
 
+
+
 app.post('/training', (req, res) => {
   let body = req.body;
   let id = body.gameId;
   let iterations = Math.floor(body.trainingIterations / config.THREAD_COUNT);
   statisticsMap[id] = DEFAULT_STATISTICS;
   threadMap[id] = [];
+  let iterationsLeft = iterations;
+  function threadIterations() {
+    if (iterationsLeft < 100) {
+      iterationsLeft = 0;
+      return iterationsLeft
+    } else {
+      iterationsLeft -= 100;
+      return 100
+    }
+  }
+
   for (let i = 0; i < config.THREAD_COUNT; i++) {
     const thread = threads.spawn('training.js');
     winston.info('training spawned...');
     threadMap[id].push(thread);
-    thread.send({iterations, body})
+
+    thread.send({iterations: threadIterations(), body})
       .on('done', message => {
-        winston.info('worker sent message: ' + JSON.stringify(message, null, 2));
         if (message.result) statisticsMap[id][message.result] += 1;
         if (message.isFinished) {
-          threadMap[id].splice(threadMap[id].indexOf(thread), 1);
-          thread.kill();
+          if (iterationsLeft <= 0) {
+            threadMap[id].splice(threadMap[id].indexOf(thread), 1);
+            thread.kill();
+          } else {
+            thread.send({iterations: threadIterations(), body});
+          }
         }
       })
       .on('error', error => {

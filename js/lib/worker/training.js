@@ -29,14 +29,14 @@ function createPromises(count, iterations, fn, callback) {
 
 module.exports = function (input, done) {
   let {iterations, body} = input;
-  let gameInfo = {
-    id: body.gameId,
-    player1: Player.create(body.player1),
-    player2: Player.create(body.player2)
-  };
+  let id = body.gameId;
+    let player1 = Player.create(body.player1);
+    let player2 = Player.create(body.player2);
 
   createPromises(0, iterations, (resolve) => {
-    playGame(new Game(gameInfo.id), gameInfo.player1, gameInfo.player2, result => {
+    playGame(new Game(id), player1, player2, result => {
+      player1.endGame(result);
+      player2.endGame(result);
       done({result});
       resolve();
     })

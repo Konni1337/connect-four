@@ -83,14 +83,14 @@ export default class QLearning {
           if (err) throw err;
           self.applyEpsilonGreedy(bestStateActionValue, possibleActions, self, (stateActionValue) => {
             self.lastStateActionValue = stateActionValue;
-            winston.info(this.id + ' found best action: ' + JSON.stringify(stateActionValue.stateAction.action, null, 2));
+            // winston.info(this.id + ' found best action: ' + JSON.stringify(stateActionValue.stateAction.action, null, 2));
             return callback(stateActionValue.stateAction.action);
           });
         });
       } else {
         self.applyEpsilonGreedy(bestStateActionValue, possibleActions, self, (stateActionValue) => {
           self.lastStateActionValue = stateActionValue;
-          winston.info(this.id + ' found best action: ' + JSON.stringify(stateActionValue.stateAction.action, null, 2));
+          // winston.info(this.id + ' found best action: ' + JSON.stringify(stateActionValue.stateAction.action, null, 2));
           return callback(stateActionValue.stateAction.action);
         });
       }
