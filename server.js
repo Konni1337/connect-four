@@ -107,7 +107,7 @@ app.post('/training', (req, res) => {
         }
       })
       .on('error', error => {
-        console.error(error);
+        console.error('error in trainings thread: ' + error);
         threadMap[id].splice(threadMap[id].indexOf(thread), 1);
         thread.kill();
       })

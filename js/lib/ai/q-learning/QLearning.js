@@ -75,7 +75,7 @@ export default class QLearning {
     this.experience.bestStateActionValue(state, possibleActions, (err, bestStateActionValue) => {
       if (err) throw err;
       // If this isn't the first state, then apply TD-Update
-      if (self.lastStateActionValue != null) {
+      if (self.lastStateActionValue) {
         let tdError = reward + self.gamma * bestStateActionValue.value - self.lastStateActionValue.value;
 
         let value = parseFloat(self.lastStateActionValue.value) + self.alpha * tdError;
@@ -134,7 +134,7 @@ export default class QLearning {
       let state = bestStateActionValue.stateAction.state;
       let stateAction = new StateAction(state, action);
       self.experience.getValue(stateAction, (err, value) => {
-        if (err) throw err;
+        if (err || isNaN(value)) throw err || 'value must be a number, got ' + typeof value;
         callback(new StateActionValue(stateAction, value))
       });
     } else {

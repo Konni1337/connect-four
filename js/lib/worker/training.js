@@ -9,7 +9,12 @@ import Game from "../Game";
  * @returns {*}
  */
 function playGame(game, player1, player2, callback) {
-  if (game.isFinished) return callback(game.result);
+  if (game.isFinished) {
+    let result = game.result;
+    player1.endGame(result);
+    player2.endGame(result);
+    return callback(result);
+  }
   let currentPlayer = game.currentPlayer === 1 ? player1 : player2;
   return currentPlayer.selectAction(game, move => playGame(game.makeMove(move), player1, player2, callback));
 }
@@ -34,9 +39,7 @@ module.exports = function (input, done) {
     let player2 = Player.create(body.player2);
 
   createPromises(0, iterations, (resolve) => {
-    playGame(new Game(id), player1, player2, result => {
-      player1.endGame(result);
-      player2.endGame(result);
+    playGame(new Game(id), player1.clone(), player2.clone(), result => {
       done({result});
       resolve();
     })
