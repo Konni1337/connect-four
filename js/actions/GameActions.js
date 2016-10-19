@@ -1,5 +1,7 @@
 import * as ActionTypes from "../constants/gameActionTypes";
 import {GAME_TYPE_TRAINING, HUMAN} from "../constants/GameFixtures";
+require('es6-promise').polyfill();
+import 'whatwg-fetch';
 
 
 export function changeGameType(gameType) {
