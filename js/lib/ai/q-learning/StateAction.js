@@ -1,3 +1,4 @@
+import stateToKeyString from "../dbLayer/stateToKeyString";
 /**
  * This object represents a state action
  */
@@ -8,5 +9,9 @@ export default class StateAction {
   constructor(state, action) {
     this.state = state;
     this.action = action
+  }
+
+  print() {
+    return stateToKeyString(this);
   }
 }

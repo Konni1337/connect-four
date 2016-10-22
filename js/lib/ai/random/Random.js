@@ -35,5 +35,7 @@ export default class Random {
   /**
    * A hook that is called when a game is finished
    */
-  endGame() {}
+  endGame(result, callback) {
+    callback();
+  }
 }

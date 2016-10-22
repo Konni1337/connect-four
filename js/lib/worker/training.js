@@ -1,47 +1,40 @@
 import Player from "../Player";
 import Game from "../Game";
+import winston from 'winston';
+
+let id, player1, player2;
+
 /**
  * Plays one game and updates the result
  * @param game
- * @param player1
- * @param player2
  * @param callback
  * @returns {*}
  */
-function playGame(game, player1, player2, callback) {
-  if (game.isFinished) {
-    let result = game.result;
-    player1.endGame(result, 1);
-    player2.endGame(result, 2);
-    return callback(result);
-  }
+function playGame(game, callback) {
+  if (game.isFinished) return callback(game.result);
   let currentPlayer = game.currentPlayer === 1 ? player1 : player2;
-  return currentPlayer.selectAction(game, move => playGame(game.makeMove(move), player1, player2, callback));
+  return currentPlayer.selectAction(game, move => playGame(game.makeMove(move), callback));
 }
 
-function createPromises(count, iterations, fn, callback) {
-  let promises = [];
-  for (let i = 0; i < iterations || i < 10; i++) {
-    count++;
-    promises.push(new Promise(fn));
+function playGames(current, max, done, progress) {
+  if (current === max) {
+    done();
+  } else{
+    playGame(new Game(id), result => {
+      player1.endGame(result, () => {
+        player2.endGame(result, () => {
+          progress(result);
+          playGames(current + 1, max, done, progress);
+        })
+      })
+    });
   }
-  Promise.all(promises).then(() => {
-    count === iterations ? callback() : createPromises(count, iterations, fn, callback)
-  });
 }
 
-
-
-module.exports = function (input, done) {
+module.exports = function (input, done, progress) {
   let {iterations, body} = input;
-  let id = body.gameId;
-    let player1 = Player.create(body.player1);
-    let player2 = Player.create(body.player2);
-
-  createPromises(0, iterations, (resolve) => {
-    playGame(new Game(id), player1.clone(), player2.clone(), result => {
-      done({result});
-      resolve();
-    })
-  }, () => done({isFinished: true}));
+  id = body.gameId;
+  player1 = Player.create(body.player1);
+  player2 = Player.create(body.player2);
+  playGames(0, iterations, done, progress)
 };

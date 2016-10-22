@@ -71,58 +71,34 @@ app.post('/statistics', (req, res) => {
 });
 
 
-
 app.post('/training', (req, res) => {
   let body = req.body;
   let id = body.gameId;
   let iterations = Math.floor(body.trainingIterations / config.THREAD_COUNT);
   statisticsMap[id] = DEFAULT_STATISTICS;
   threadMap[id] = [];
-  let iterationsLeft = iterations;
-  function threadIterations() {
-    if (iterationsLeft < 100) {
-      let tmp = iterationsLeft;
-      iterationsLeft = 0;
-      return tmp;
-    } else {
-      iterationsLeft -= 100;
-      return 100
-    }
-  }
-
   for (let i = 0; i < config.THREAD_COUNT; i++) {
     const thread = threads.spawn('training.js');
-    winston.info('training spawned...');
+    winston.info('training thread spawned...');
     threadMap[id].push(thread);
-
-    thread.send({iterations: threadIterations(), body})
-      .on('done', message => {
-        if (message.result) statisticsMap[id][message.result] += 1;
-        if (message.isFinished) {
-          if (iterationsLeft <= 0) {
-            threadMap[id].splice(threadMap[id].indexOf(thread), 1);
-            thread.kill();
-          } else {
-            thread.send({iterations: threadIterations(), body});
-          }
-        }
+    thread
+      .send({iterations, body})
+      .on('progress', function (result) {
+        statisticsMap[id][result] += 1;
       })
-      .on('error', error => {
-        console.error('error in trainings thread: ' + error);
+      .on('done', function () {
         threadMap[id].splice(threadMap[id].indexOf(thread), 1);
         thread.kill();
+        console.log('training thread is done');
       })
+      .on('error', error => {
+        console.log(error);
+        threadMap[id].splice(threadMap[id].indexOf(thread), 1);
+        thread.kill();
+        console.log('training thread interrupted');
+      });
   }
   res.status(200).json(JSON.stringify({trainingsId: id, statistics: DEFAULT_STATISTICS}));
-
-
-  // let id = body.gameId;
-  // let player1 = Player.create(body.player1);
-  // let player2 = Player.create(body.player2);
-  // let training = new Training(body.trainingIterations, player1, player2, id);
-  // // res.status(200).json(JSON.stringify({trainingsId: training.id, statistics: training.statistics}));
-  // training.start();
-  // trainingCheck(training, res);
 });
 
 function trainingCheck(training, res) {
@@ -157,7 +133,11 @@ app.post('/move', (req, res) => {
   let body = req.body;
   let move = body.move, id = body.gameId;
   let {game, player1, player2} = gamesMap[id];
-  if (game.currentPlayer === 2) player2 = [player1, player1 = player2][0];
+  if (game.currentPlayer === 2) {
+    let tmpPlayer = player1;
+    player1 = player2;
+    player2 = tmpPlayer;
+  }
   if (player1.isHuman() && move) {
     if (game.makeMove(move).isFinished) {
       statisticsMap[id][game.result] += 1;
@@ -166,10 +146,13 @@ app.post('/move', (req, res) => {
       if (!player2.isHuman()) {
         player2.selectAction(game, move => {
           if (game.makeMove(move).isFinished) {
-            player2.endGame(game.result, 2);
-            statisticsMap[id][game.result] += 1;
+            player2.endGame(game.result, () => {
+              statisticsMap[id][game.result] += 1;
+              res.status(200).json(JSON.stringify({game, statistics: statisticsMap[id]}));
+            });
+          } else {
+            res.status(200).json(JSON.stringify({game, statistics: statisticsMap[id]}));
           }
-          res.status(200).json(JSON.stringify({game, statistics: statisticsMap[id]}));
         })
       } else {
         res.status(200).json(JSON.stringify({game, statistics: statisticsMap[id]}));
@@ -179,11 +162,15 @@ app.post('/move', (req, res) => {
     player1.selectAction(game, move => {
       if (game.makeMove(move).isFinished) {
         let result = game.result;
-        player1.endGame(result, 1);
-        player2.endGame(result, 2);
-        statisticsMap[id][result] += 1;
+        player1.endGame(result, () => {
+          player2.endGame(result, () => {
+            statisticsMap[id][result] += 1;
+            res.status(200).json(JSON.stringify({game, statistics: statisticsMap[id]}));
+          });
+        });
+      } else {
+        res.status(200).json(JSON.stringify({game, statistics: statisticsMap[id]}));
       }
-      res.status(200).json(JSON.stringify({game, statistics: statisticsMap[id]}));
     })
   } else {
     res.status(400)

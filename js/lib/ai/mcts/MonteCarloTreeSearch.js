@@ -35,7 +35,8 @@ export default class MonteCarloTreeSearch {
   /**
    * A hook that is called when a game is finished
    */
-  endGame() {
+  endGame(result, callback) {
+    callback();
   }
 
   /**

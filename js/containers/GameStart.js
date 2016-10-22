@@ -29,13 +29,15 @@ class GameStart extends Component {
       trainingIterations: this.props.trainingIterations,
       player1: {
         params: {
-          id: this.refs.player1Id.value || 'default'
+          id: this.refs.player1Id.value || 'default',
+          playerId: 1
         },
         algorithm: this.refs.player1.value
       },
       player2: {
         params: {
-          id: this.refs.player2Id.value || 'default'
+          id: this.refs.player2Id.value || 'default',
+          playerId: 2
         },
         algorithm: this.refs.player2.value
       }
@@ -69,6 +71,7 @@ class GameStart extends Component {
             <label htmlFor="player1-id" className="col-sm-2 control-label">ID</label>
             <div className="col-sm-10">
               <input id="player1-id"
+                     defaultValue="1"
                      className="form-control"
                      ref="player1Id"
                      type="text"
@@ -87,6 +90,7 @@ class GameStart extends Component {
             <label htmlFor="player2-id" className="col-sm-2 control-label">ID</label>
             <div className="col-sm-10">
               <input id="player2-id"
+                     defaultValue="2"
                      className="form-control"
                      ref="player2Id"
                      type="text"
@@ -120,6 +124,7 @@ class GameStart extends Component {
             <label htmlFor="player1-id" className="col-sm-2 control-label">ID</label>
             <div className="col-sm-10">
               <input id="player1-id"
+                     defaultValue="1"
                      className="form-control"
                      ref="player1Id"
                      type="text"
@@ -138,6 +143,7 @@ class GameStart extends Component {
             <label htmlFor="player2-id" className="col-sm-2 control-label">ID</label>
             <div className="col-sm-10">
               <input id="player2-id"
+                     defaultValue="2"
                      className="form-control"
                      ref="player2Id"
                      type="text"

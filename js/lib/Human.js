@@ -24,5 +24,7 @@ export default class Human {
   /**
    * A hook that is called when a game is finished
    */
-  endGame() {}
+  endGame(result, callback) {
+    callback();
+  }
 }
