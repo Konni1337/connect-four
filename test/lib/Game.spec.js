@@ -113,7 +113,7 @@ describe('Game', () => {
       T.expect(game.makeMove(move).isFinished).toBe(true)
     });
 
-    it('should set result if with the move a player summedValue', () => {
+    it('should set result if with the move a player wins', () => {
       const grid = [
         [2, 1, 2, 1],
         [1, 2, 1, 0],
@@ -126,7 +126,7 @@ describe('Game', () => {
       T.expect(game.makeMove(move).result).toBe(1)
     });
 
-    it('should set result to draw if grid is full and no one summedValue', () => {
+    it('should set result to draw if grid is full and no one wins', () => {
       const grid = [
         [2, 1, 2, 1],
         [1, 2, 1, 0],

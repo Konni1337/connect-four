@@ -12,9 +12,6 @@ export const EMPTY_VALUE = 0;
 export const GAME_TYPE_NORMAL = 'normal';
 export const GAME_TYPE_TRAINING = 'training';
 export const GAME_TYPE_NONE = 'none';
-export const MCTS_WIN_REWARD = 1;
-export const MCTS_LOSE_REWARD = -1;
-export const MCTS_DRAW_REWARD = 0;
 
 export const Q_LEARNING_CONFIG = {
   DEFAULT_REWARDS: {

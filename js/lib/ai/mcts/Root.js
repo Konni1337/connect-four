@@ -30,7 +30,7 @@ export default class Root extends Node {
   }
 
   /**
-   * This start a simulation to explore the possible moves and estimate there UTC summedValue
+   * This start a simulation to explore the possible moves and estimate there UTC wins
    *
    * @returns {Object} move
    */

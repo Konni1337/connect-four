@@ -1,9 +1,9 @@
 import * as T from '../../../testHelper';
 import Node from "../../../../js/lib/ai/mcts/Node";
 import Game from "../../../../js/lib/Game";
-import {MCTS_WIN_REWARD, MCTS_DRAW_REWARD, DRAW} from "../../../../js/constants/GameFixtures";
+import {MCTS_WIN_VALUE, MCTS_DRAW_VALUE, DRAW} from "../../../../js/constants/GameFixtures";
 import RandomMCTS from "../../../../js/lib/ai/mcts/RandomMCTS";
-import {MCTS_LOSE_REWARD} from "../../../../js/constants/GameFixtures";
+import {MCTS_LOSE_VALUE} from "../../../../js/constants/GameFixtures";
 import Root from "../../../../js/lib/ai/mcts/Root";
 
 describe('Node', () => {
@@ -89,9 +89,9 @@ describe('Node', () => {
 
     it('should add win reward', () => {
       let node = new Node(game, move);
-      T.expect(node.summedValue).toBe(0);
+      T.expect(node.wins).toBe(0);
       node.won();
-      T.expect(node.summedValue).toBe(MCTS_WIN_REWARD);
+      T.expect(node.wins).toBe(1);
     });
   });
 
@@ -105,9 +105,9 @@ describe('Node', () => {
 
     it('should add the draw reward', () => {
       let node = new Node(game, move);
-      T.expect(node.summedValue).toBe(0);
+      T.expect(node.wins).toBe(0);
       node.draw();
-      T.expect(node.summedValue).toBe(MCTS_DRAW_REWARD);
+      T.expect(node.wins).toBe(0.5);
     });
   });
 
@@ -121,9 +121,9 @@ describe('Node', () => {
 
     it('should add the lose reward', () => {
       let node = new Node(game, move);
-      T.expect(node.summedValue).toBe(0);
+      T.expect(node.wins).toBe(0);
       node.lost();
-      T.expect(node.summedValue).toBe(MCTS_LOSE_REWARD);
+      T.expect(node.wins).toBe(0);
     });
   });
 
@@ -194,7 +194,7 @@ describe('Node', () => {
       T.expect(root.game).toEqual(rootCompare.game);
       T.expect(root.move).toEqual(rootCompare.move);
       T.expect(root.parent).toEqual(rootCompare.parent);
-      T.expect(root.summedValue).toEqual(rootCompare.summedValue);
+      T.expect(root.wins).toEqual(rootCompare.wins);
       T.expect(root.visits).toEqual(rootCompare.visits);
       T.expect(root.children).toEqual(rootCompare.children);
       T.expect(root.unvisitedMoves).toEqual(rootCompare.unvisitedMoves);
@@ -202,9 +202,9 @@ describe('Node', () => {
   });
 
   describe('utcValue()', () => {
-    it('should return 0 if visits, value and parent visits are 0', () => {
+    it('should return INFINITY if visits are 0', () => {
       let node = new Node(game, move, new Root(game));
-      T.expect(node.utcValue()).toEqual(0);
+      T.expect(node.utcValue()).toEqual(Number.POSITIVE_INFINITY);
     });
 
     it('should return correct utcValue if value are 0', () => {
@@ -212,7 +212,7 @@ describe('Node', () => {
       root.visits = 2;
       let node = new Node(game, move, root);
       node.visits = 2;
-      T.expect(T.roundDecimal(node.utcValue(), 9)).toEqual(0.263276885); // calculated by hand
+      T.expect(T.roundDecimal(node.utcValue(), 9)).toEqual(1.177410023); // calculated by hand
     });
 
     it('should return correct utcValue', () => {
@@ -220,8 +220,8 @@ describe('Node', () => {
       root.visits = 2;
       let node = new Node(game, move, root);
       node.visits = 2;
-      node.summedValue = 2;
-      T.expect(T.roundDecimal(node.utcValue(), 9)).toEqual(1.263276885); // calculated by hand
+      node.wins = 2;
+      T.expect(T.roundDecimal(node.utcValue(), 9)).toEqual(2.177410023); // calculated by hand
     });
   });
 
@@ -233,7 +233,7 @@ describe('Node', () => {
 
     it('should calculate the win percentage', () => {
       let node = new Node(game, move);
-      node.summedValue = 2;
+      node.wins = 2;
       node.visits = 5;
       T.expect(node.value()).toEqual(2 / 5);
     });
@@ -254,7 +254,7 @@ describe('Node', () => {
       child.visits = 1;
       let child2 = node.expand();
       child2.visits = 1;
-      child2.summedValue = 1;
+      child2.wins = 1;
       T.expect(node.utcChild()).toBe(child2);
     });
   })

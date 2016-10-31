@@ -42,7 +42,7 @@ export default class Experience {
   }
 
   /**
-   * Sets the state action summedValue on the server
+   * Sets the state action wins on the server
    *
    * @param stateAction
    * @param value
@@ -71,7 +71,7 @@ export default class Experience {
   }
 
   /**
-   * Gets a state action summedValue from the server
+   * Gets a state action wins from the server
    *
    * @param stateAction
    * @param callback
@@ -86,7 +86,7 @@ export default class Experience {
   }
 
   /**
-   * Finds the best summedValue of an array of state actions
+   * Finds the best wins of an array of state actions
    *
    * @param state
    * @param possibleActions

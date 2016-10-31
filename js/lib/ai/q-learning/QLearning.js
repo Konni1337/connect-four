@@ -121,7 +121,7 @@ export default class QLearning {
 
   /** This method selects an Action entry according to the epsilon greedy policy.
    *
-   *  @param bestStateActionValue the currently selected best state action summedValue
+   *  @param bestStateActionValue the currently selected best state action wins
    *  @param possibleActions all possible actions in the current state
    * @param callback function
    *

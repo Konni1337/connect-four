@@ -1,12 +1,12 @@
 import RandomMCTS from "./RandomMCTS";
-import {DRAW, MCTS_WIN_REWARD, MCTS_DRAW_REWARD, MCTS_LOSE_REWARD} from "../../../constants/GameFixtures";
+import {DRAW} from "../../../constants/GameFixtures";
 
 export default class Node {
   constructor(game, move, parent) {
     this.game = game;
     this.move = move;
     this.parent = parent;
-    this.summedValue = 0;
+    this.wins = 0;
     this.visits = 0;
     this.children = [];
     this.unvisitedMoves = game.getValidMoves();
@@ -16,7 +16,7 @@ export default class Node {
     let move = this.move && JSON.parse(JSON.stringify(this.move));
     let node = new Node(this.game.clone(), move);
     node.parent = this.parent && this.parent.clone();
-    node.summedValue = this.summedValue;
+    node.wins = this.wins;
     node.visits = this.visits;
     node.children = this.children.map(child => child.clone());
     node.unvisitedMoves = this.unvisitedMoves.slice();
@@ -42,19 +42,19 @@ export default class Node {
   }
 
   /**
-   * Increments the visits and summedValue
+   * Increments the visits and wins
    */
   won() {
     this.visits = this.visits + 1;
-    this.summedValue = this.summedValue + MCTS_WIN_REWARD;
+    this.wins = this.wins + 1;
   }
 
   /**
-   * Increments the visits by 1 and summedValue by 0,5
+   * Increments the visits by 1 and wins by 0,5
    */
   draw() {
     this.visits = this.visits + 1;
-    this.summedValue = this.summedValue + MCTS_DRAW_REWARD;
+    this.wins = this.wins + 0.5;
   }
 
   /**
@@ -62,7 +62,6 @@ export default class Node {
    */
   lost() {
     this.visits = this.visits + 1;
-    this.summedValue = this.summedValue + MCTS_LOSE_REWARD;
   }
 
   /**
@@ -101,12 +100,13 @@ export default class Node {
   }
 
   /**
-   * Returns the UTC summedValue for this move
+   * Returns the UTC wins for this move
    *
    * @returns {number}
    */
   utcValue() {
-    let value = this.value() + Math.sqrt(Math.log(this.parent.visits) / (5 * this.visits));
+    if (this.visits === 0) return Number.POSITIVE_INFINITY;
+    let value = this.value() + 2 * (1 / Math.sqrt(2)) * Math.sqrt( 2 * Math.log(this.parent.visits) / this.visits);
     return isNaN(value) ? 0 : value
   }
 
@@ -116,12 +116,12 @@ export default class Node {
    * @returns {number}
    */
   value() {
-    let value = this.summedValue / this.visits;
+    let value = this.wins / this.visits;
     return isNaN(value) ? 0 : value
   }
 
   /**
-   * Returns the child with the highest UTC summedValue
+   * Returns the child with the highest UTC wins
    *
    * @returns {Node}
    */
