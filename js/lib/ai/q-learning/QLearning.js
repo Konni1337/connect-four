@@ -85,7 +85,6 @@ export default class QLearning {
 
   ensureInit(callback) {
     var self = this;
-    console.log('init ' + (!self.episodes || !self.alpha));
     if (!self.episodes || !self.alpha) {
       self.experience.get('episodes', (err, episodes) => {
         if (err) episodes = 0;
@@ -106,7 +105,6 @@ export default class QLearning {
    */
   endGame(result, callback) {
     let self = this;
-    if (!self.lastStateActionValue) console.log(self.id, self.playerId);
     let oldValue = self.lastStateActionValue.value,
       oldStateAction = self.lastStateActionValue.stateAction,
       reward = result === DRAW ? self.rewards.draw : result === self.playerId ? self.rewards.won : self.rewards.lost,
