@@ -23,16 +23,25 @@ export default class QLearning {
     this.e_2 = params.e_2 || defaults.DEFAULT_E_2;
     this.statisticsDb = dbLayer.getDatabase(STATISTICS_DB_PREFIX + this.id);
     this.lastStateActionValue = null;
-
-
+    this.wins = 0;
+    this.draws = 0;
   }
 
   initData(callback) {
     let self = this;
-    self.experience.get('episodes', (err, episodes) => {
-      if (err) episodes = 0;
-      self.episodes = parseInt(episodes);
-      self.alpha = this.calcAlpha();
+    self.experience.get('episodes', (err, json) => {
+      if (err) {
+        self.episodes = 0;
+        self.wins = 0;
+        self.draws = 0;
+      } else {
+        let data = JSON.parse(json);
+        self.episodes = parseInt(data.episodes || 0);
+        self.wins = parseInt(data.wins || 0);
+        self.draws = parseInt(data.draws || 0);
+      }
+
+      self.alpha = self.calcAlpha();
       console.log('loaded initial data for qLearning ' + self.id + ' with ' + self.episodes + ' episodes;');
       callback()
     });
@@ -51,7 +60,9 @@ export default class QLearning {
       e_2: this.e_2,
       episodes: this.episodes,
       alpha: this.alpha,
-      lastStateActionValue: this.lastStateActionValue
+      lastStateActionValue: this.lastStateActionValue,
+      wins: this.wins,
+      draws: this.draws
     })
   }
 
@@ -126,8 +137,23 @@ export default class QLearning {
       self.lastStateActionValue = null;
       self.alpha = self.calcAlpha();
       self.episodes += 1;
-      self.experience.set('episodes', self.episodes, () => {
-        self.statisticsDb.put(self.episodes, result, () => callback(result))
+      if (result === self.playerId) self.wins += 1;
+      if (result === DRAW) self.draws += 1;
+      self.experience.set('episodes', JSON.stringify({
+        episodes: self.episodes,
+        wins: self.wins,
+        draws: self.draws
+      }), () => {
+        if (self.episodes % 1000 === 0) {
+          console.log('current win percentage for ' + self.id + ' is ' + ((self.wins / self.episodes) * 100) + '%');
+          console.log('current draw percentage for ' + self.id + ' is ' + ((self.draws / self.episodes) * 100) + '%');
+          self.statisticsDb.put(self.episodes, JSON.stringify({
+            wins: self.wins,
+            draws: self.draws
+          }), () => callback(result))
+        } else {
+          callback(result)
+        }
       });
     });
   }
