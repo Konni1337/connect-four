@@ -1,7 +1,6 @@
 import Game from "../../Game";
 
-export default function stateToKeyString(stateAction) {
-  let grid = stateAction.state; // 2D grid array
+export default function stateToString(grid) {
   let result = '';
   for(let i = 0 , len = grid.length ; i < len ; i++){
     for(let j = 0, len = grid[i].length; j < len ; j++){
@@ -10,7 +9,11 @@ export default function stateToKeyString(stateAction) {
       if (value === 0) break;
     }
   }
-  return result + '.' + stateAction.action.index;
+  return result;
+}
+
+export function stateActionString(stringState, action) {
+  return stringState + '.' + action.index
 }
 
 export function importedStateToString(state, action) {

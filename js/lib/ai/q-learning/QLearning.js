@@ -1,9 +1,9 @@
-import StateAction from "./StateAction";
-import StateActionValue from "./StateActionValue";
-import {DRAW} from "../../../constants/GameFixtures";
 import {getRandomElement} from "../../../helpers/CommonHelper";
-import QLearningParams from './QLearningParams';
-import winston from "winston";
+import dbLayer from "../dbLayer/dbLayer";
+import {STATISTICS_DB_PREFIX} from "../../../constants/config";
+import stateToString, {stateActionString} from "../dbLayer/stateToKeyString";
+import Experience from "./Experience";
+import {Q_LEARNING_CONFIG as defaults, DRAW} from "../../../constants/GameFixtures";
 
 /**
  * This is a Q-Learning AI for the game connect four
@@ -12,17 +12,30 @@ export default class QLearning {
   id = null;
 
   constructor(params) {
-    let defaultParams = new QLearningParams(params.id);
     this.id = params.id;
     this.playerId = params.playerId;
-    this.rewards = params.rewards || defaultParams.rewards;
-    this.experience = params.experience || defaultParams.experience;
-    this.alpha_0 = params.alpha_0 || defaultParams.alpha_0;
-    this.gamma = params.gamma || defaultParams.gamma;
-    this.epsilon = params.epsilon || defaultParams.epsilon;
-    this.dynamicAlpha = params.dynamicAlpha || defaultParams.dynamicAlpha;
-    this.e_2 = params.e_2 || defaultParams.e_2;
+    this.rewards = params.rewards || defaults.DEFAULT_REWARDS;
+    this.experience = new Experience(this.id);
+    this.alpha_0 = params.alpha_0 || defaults.DEFAULT_ALPHA_0;
+    this.gamma = params.gamma || defaults.DEFAULT_GAMMA;
+    this.epsilon = params.epsilon || defaults.DEFAULT_EPSILON;
+    this.dynamicAlpha = params.dynamicAlpha || defaults.DEFAULT_DYNAMIC_ALPHA;
+    this.e_2 = params.e_2 || defaults.DEFAULT_E_2;
+    this.statisticsDb = dbLayer.getDatabase(STATISTICS_DB_PREFIX + this.id);
     this.lastStateActionValue = null;
+
+
+  }
+
+  initData(callback) {
+    let self = this;
+    self.experience.get('episodes', (err, episodes) => {
+      if (err) episodes = 0;
+      self.episodes = parseInt(episodes);
+      self.alpha = this.calcAlpha();
+      console.log('loaded initial data for qLearning ' + self.id + ' with ' + self.episodes + ' episodes;');
+      callback()
+    });
   }
 
   clone() {
@@ -30,6 +43,7 @@ export default class QLearning {
       id: this.id,
       rewards: this.rewards,
       experience: this.experience,
+      statisticsDb: this.statisticsDb,
       alpha_0: this.alpha_0,
       gamma: this.gamma,
       epsilon: this.epsilon,
@@ -41,28 +55,33 @@ export default class QLearning {
     })
   }
 
-
-  /** This method returns best known action in the given state out of the possible actions
+  /**
+   * Updates the lastStateActionValue
    *
-   *  @param state the current state the agent is in
-   *  @param possibleActions a list of possible actions
-   *  @param callback function
-   *
-   *  @return StateActionValue which contains the best action, the current state and the
-   *          Q-Value of the best action
+   * @param bestValue
+   * @param callback
+   * @returns {*}
    */
-  bestStateActionValue(state, possibleActions, callback) {
-    var self = this;
-    self.experience.bestStateActionValue(state, possibleActions, (bestStateActionValue) => {
-      if (self.lastStateActionValue) {
-        let oldValue = self.lastStateActionValue.value;
-        let newValue = oldValue + self.alpha * (self.gamma * bestStateActionValue.value - oldValue);
-        self.experience.setValue(self.lastStateActionValue.stateAction, newValue, () => callback(bestStateActionValue));
-      } else {
-        callback(bestStateActionValue)
-      }
-    });
+  updateQValue(bestValue, callback) {
+    if (!this.lastStateActionValue) return callback();
+
+    let {state, action, value} = this.lastStateActionValue;
+
+    this.experience.setQValue(stateActionString(state, action), this.calcQValue(value, bestValue), callback);
   }
+
+  /**
+   * Calculates the new QValue
+   *
+   * @param oldValue
+   * @param bestValue
+   * @param reward
+   * @returns {*}
+   */
+  calcQValue(oldValue, bestValue, reward = 0) {
+    return oldValue + this.alpha * (reward + this.gamma * bestValue - oldValue);
+  }
+
 
   /**
    * Selects the best action
@@ -71,30 +90,25 @@ export default class QLearning {
    * @param callback
    */
   selectAction(game, callback) {
-    let self = this;
-    let possibleActions = game.getValidMoves();
-    let state = game.grid.map(col => col.slice(0));
-    self.ensureInit(() => {
-      self.bestStateActionValue(state, possibleActions, (bestStateActionValue) => {
-        self.applyEpsilonGreedy(bestStateActionValue, possibleActions, (action) => {
-          callback(action)
-        });
-      })
-    });
-  }
+    let self = this,
+      possibleActions = game.getValidMoves(),
+      state = stateToString(game.grid);
 
-  ensureInit(callback) {
-    var self = this;
-    if (!self.episodes || !self.alpha) {
-      self.experience.get('episodes', (err, episodes) => {
-        if (err) episodes = 0;
-        self.episodes = parseInt(episodes);
-        self.alpha = self.calcAlpha();
-        callback()
+    self.experience.bestStateActionValue(state, possibleActions, ({state, action, value}) => {
+      self.updateQValue(value, () => {
+        // apply epsilon greedy
+        if (Math.random() < self.epsilon) {
+          let newAction = getRandomElement(possibleActions);
+          self.experience.getQValue(stateActionString(state, newAction), newValue => {
+            self.lastStateActionValue = {state, action: newAction, value: newValue};
+            callback(newAction);
+          });
+        } else {
+          self.lastStateActionValue = {state, action, value};
+          callback(action);
+        }
       });
-    } else {
-      callback()
-    }
+    });
   }
 
   /**
@@ -104,41 +118,18 @@ export default class QLearning {
    * @param callback
    */
   endGame(result, callback) {
-    let self = this;
-    let oldValue = self.lastStateActionValue.value,
-      oldStateAction = self.lastStateActionValue.stateAction,
-      reward = result === DRAW ? self.rewards.draw : result === self.playerId ? self.rewards.won : self.rewards.lost,
-      newValue = oldValue + self.alpha * (reward - oldValue);
-    self.experience.setValue(oldStateAction, newValue, () => {
+    let self = this,
+      {state, action, value} = self.lastStateActionValue,
+      newValue = self.calcQValue(value, 0, self.getReward(result));
+
+    self.experience.setQValue(stateActionString(state, action), newValue, () => {
       self.lastStateActionValue = null;
       self.alpha = self.calcAlpha();
       self.episodes += 1;
       self.experience.set('episodes', self.episodes, () => {
-        callback(result)
+        self.statisticsDb.put(self.episodes, result, () => callback(result))
       });
     });
-  }
-
-  /** This method selects an Action entry according to the epsilon greedy policy.
-   *
-   *  @param bestStateActionValue the currently selected best state action wins
-   *  @param possibleActions all possible actions in the current state
-   * @param callback function
-   *
-   * @return action if exploration occurred then a random action otherwise the bestAction
-   */
-  applyEpsilonGreedy(bestStateActionValue, possibleActions, callback) {
-    var self = this;
-    if (Math.random() < self.epsilon) {
-      let stateAction = new StateAction(bestStateActionValue.stateAction.state, getRandomElement(possibleActions));
-      self.experience.getValue(stateAction, value => {
-        self.lastStateActionValue = new StateActionValue(stateAction, value);
-        callback(self.lastStateActionValue.stateAction.action);
-      });
-    } else {
-      self.lastStateActionValue = bestStateActionValue;
-      callback(bestStateActionValue.stateAction.action);
-    }
   }
 
   /**
@@ -150,6 +141,27 @@ export default class QLearning {
     return false;
   }
 
+  /**
+   * Returns the reward depending on the result
+   * @param result
+   * @returns {*}
+   */
+  getReward(result) {
+    switch (result) {
+      case DRAW:
+        return this.rewards.draw;
+      case this.playerId:
+        return this.rewards.won;
+      default:
+        return this.rewards.lost;
+    }
+  }
+
+  /**
+   * Calculates the new alpha value
+   *
+   * @returns {*}
+   */
   calcAlpha() {
     return this.dynamicAlpha ? this.alpha_0 * Math.pow(0.5, this.episodes / this.e_2) : this.alpha_0;
   }

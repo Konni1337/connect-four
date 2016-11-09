@@ -11,3 +11,4 @@ export const IMPORT_ON_LOAD = false;
 export const IMPORT_FILE = '/home/konstantin/Downloads/ql-vs-pql.exp2';
 // Be aware that multithreading might not work for Q-Learning
 export const THREAD_COUNT = 1;
+export const STATISTICS_DB_PREFIX = 'statistics';

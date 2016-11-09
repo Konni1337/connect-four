@@ -1,6 +1,5 @@
 import Player from "../Player";
 import Game from "../Game";
-import winston from 'winston';
 
 let id, player1, player2;
 
@@ -34,7 +33,11 @@ function playGames(current, max, done, progress) {
 module.exports = function (input, done, progress) {
   let {iterations, body} = input;
   id = body.gameId;
-  player1 = Player.create(body.player1);
-  player2 = Player.create(body.player2);
-  playGames(0, iterations, done, progress)
+  Player.create(body.player1, newPlayer1 => {
+    player1 = newPlayer1;
+    Player.create(body.player2, newPlayer2 => {
+      player2 = newPlayer2;
+      playGames(0, iterations, done, progress)
+    });
+  });
 };

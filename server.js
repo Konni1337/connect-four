@@ -112,21 +112,25 @@ function trainingCheck(training, res) {
 }
 
 app.post('/game', (req, res) => {
-  let body = req.body;
-  let id = body.gameId;
-  let player1 = Player.create(body.player1);
-  let player2 = Player.create(body.player2);
-  statisticsMap[id] = DEFAULT_STATISTICS;
-  let game = new Game(id);
-  gamesMap[id] = {game, player1, player2};
-  if (!player1.isHuman() && player2.isHuman()) {
-    player1.selectAction(game, move => {
-      game.makeMove(move);
-      res.status(200).json(JSON.stringify({game: gamesMap[id].game, statistics: statisticsMap[id]}));
-    })
-  } else {
-    res.status(200).json(JSON.stringify({game: gamesMap[id].game, statistics: statisticsMap[id]}));
-  }
+  let body = req.body,
+    id = body.gameId,
+    game = new Game(id);
+
+  Player.create(body.player1, player1 => {
+    Player.create(body.player2, player2 => {
+      statisticsMap[id] = DEFAULT_STATISTICS;
+      gamesMap[id] = {game, player1, player2};
+
+      if (!player1.isHuman() && player2.isHuman()) {
+        // Make initial AI-Move
+        player1.selectAction(game, move => {
+          res.status(200).json(JSON.stringify({game: game.makeMove(move), statistics: statisticsMap[id]}));
+        })
+      } else {
+        res.status(200).json(JSON.stringify({game: gamesMap[id].game, statistics: statisticsMap[id]}));
+      }
+    });
+  });
 });
 
 app.post('/move', (req, res) => {
