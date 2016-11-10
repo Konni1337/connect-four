@@ -8,6 +8,7 @@ import Game from "./js/lib/Game";
 import Player from "./js/lib/Player";
 import threads from 'threads';
 import winston from 'winston';
+import uuid from 'node-uuid';
 // import decode from './decode';
 
 // Set base paths to thread scripts
@@ -33,7 +34,7 @@ const DEFAULT_STATISTICS = {draw: 0, 1: 0, 2: 0};
 
 let threadMap = {};
 let gamesMap = {};
-let statisticsMap = {};
+let scoresMap = {};
 
 app.use(bodyParser.json());
 app.use(require('webpack-dev-middleware')(compiler, {
@@ -59,13 +60,13 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post('/statistics', (req, res) => {
+app.post('/scores', (req, res) => {
   let body = req.body;
   let id = body.trainingsId;
-  let statistics = statisticsMap[id] || DEFAULT_STATISTICS;
+  let scores = scoresMap[id] || Object.assign({}, DEFAULT_STATISTICS);
   res.status(200).json(JSON.stringify({
     isFinished: threadMap[id].length === 0,
-    statistics: statistics,
+    scores: scores,
     trainingsId: id
   }))
 });
@@ -73,9 +74,11 @@ app.post('/statistics', (req, res) => {
 
 app.post('/training', (req, res) => {
   let body = req.body;
-  let id = body.gameId;
-  let iterations = Math.floor(body.trainingIterations / config.THREAD_COUNT);
-  statisticsMap[id] = DEFAULT_STATISTICS;
+  let id = uuid.v1();
+  console.log(id)
+  body.gameId = id;
+  let iterations = Math.floor(body.iterations / config.THREAD_COUNT);
+  scoresMap[id] = Object.assign({}, DEFAULT_STATISTICS);
   threadMap[id] = [];
   for (let i = 0; i < config.THREAD_COUNT; i++) {
     const thread = threads.spawn('training.js');
@@ -84,7 +87,7 @@ app.post('/training', (req, res) => {
     thread
       .send({iterations, body})
       .on('progress', function (result) {
-        statisticsMap[id][result] += 1;
+        scoresMap[id][result] += 1;
       })
       .on('done', function () {
         threadMap[id].splice(threadMap[id].indexOf(thread), 1);
@@ -98,36 +101,37 @@ app.post('/training', (req, res) => {
         console.log('training thread interrupted');
       });
   }
-  res.status(200).json(JSON.stringify({trainingsId: id, statistics: DEFAULT_STATISTICS}));
+  res.status(200).json(JSON.stringify({trainingsId: id, scores: Object.assign({}, DEFAULT_STATISTICS)}));
 });
 
 function trainingCheck(training, res) {
   setTimeout(function () {
     if (training.isFinished()) {
-      res.status(200).json(JSON.stringify({trainingsId: training.id, statistics: training.statistics}));
+      res.status(200).json(JSON.stringify({trainingsId: training.id, scores: training.scores}));
     } else {
       trainingCheck(training, res);
     }
   }, 1000);
 }
 
-app.post('/game', (req, res) => {
+app.post('/new-game', (req, res) => {
+  console.log(JSON.stringify(req.body, null, 2));
   let body = req.body,
-    id = body.gameId,
-    game = new Game(id);
+    id = uuid.v1(),
+    game = new Game(id, body.grid.columns, body.grid.rows);
 
   Player.create(body.player1, player1 => {
     Player.create(body.player2, player2 => {
-      statisticsMap[id] = DEFAULT_STATISTICS;
+      scoresMap[id] = Object.assign({}, DEFAULT_STATISTICS);
       gamesMap[id] = {game, player1, player2};
 
       if (!player1.isHuman() && player2.isHuman()) {
         // Make initial AI-Move
         player1.selectAction(game, move => {
-          res.status(200).json(JSON.stringify({game: game.makeMove(move), statistics: statisticsMap[id]}));
+          res.status(200).json(JSON.stringify({game: game.makeMove(move), scores: scoresMap[id]}));
         })
       } else {
-        res.status(200).json(JSON.stringify({game: gamesMap[id].game, statistics: statisticsMap[id]}));
+        res.status(200).json(JSON.stringify({game: gamesMap[id].game, scores: scoresMap[id]}));
       }
     });
   });
@@ -144,22 +148,22 @@ app.post('/move', (req, res) => {
   }
   if (player1.isHuman() && move) {
     if (game.makeMove(move).isFinished) {
-      statisticsMap[id][game.result] += 1;
-      res.status(200).json(JSON.stringify({game, statistics: statisticsMap[id]}));
+      scoresMap[id][game.result] += 1;
+      res.status(200).json(JSON.stringify({game, scores: scoresMap[id]}));
     } else {
       if (!player2.isHuman()) {
         player2.selectAction(game, move => {
           if (game.makeMove(move).isFinished) {
             player2.endGame(game.result, () => {
-              statisticsMap[id][game.result] += 1;
-              res.status(200).json(JSON.stringify({game, statistics: statisticsMap[id]}));
+              scoresMap[id][game.result] += 1;
+              res.status(200).json(JSON.stringify({game, scores: scoresMap[id]}));
             });
           } else {
-            res.status(200).json(JSON.stringify({game, statistics: statisticsMap[id]}));
+            res.status(200).json(JSON.stringify({game, scores: scoresMap[id]}));
           }
         })
       } else {
-        res.status(200).json(JSON.stringify({game, statistics: statisticsMap[id]}));
+        res.status(200).json(JSON.stringify({game, scores: scoresMap[id]}));
       }
     }
   } else if (!player1.isHuman() && !player2.isHuman()) {
@@ -168,12 +172,12 @@ app.post('/move', (req, res) => {
         let result = game.result;
         player1.endGame(result, () => {
           player2.endGame(result, () => {
-            statisticsMap[id][result] += 1;
-            res.status(200).json(JSON.stringify({game, statistics: statisticsMap[id]}));
+            scoresMap[id][result] += 1;
+            res.status(200).json(JSON.stringify({game, scores: scoresMap[id]}));
           });
         });
       } else {
-        res.status(200).json(JSON.stringify({game, statistics: statisticsMap[id]}));
+        res.status(200).json(JSON.stringify({game, scores: scoresMap[id]}));
       }
     })
   } else {

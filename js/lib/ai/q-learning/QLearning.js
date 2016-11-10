@@ -12,7 +12,7 @@ export default class QLearning {
   id = null;
 
   constructor(params) {
-    this.id = params.id;
+    this.id = params.db;
     this.playerId = params.playerId;
     this.rewards = params.rewards || defaults.DEFAULT_REWARDS;
     this.experience = new Experience(this.id);

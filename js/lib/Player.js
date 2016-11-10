@@ -12,19 +12,18 @@ export default class Player {
    * @returns {*}
    */
   static create(player, callback) {
-    let params = player.params;
     switch (player.algorithm) {
       case MCTS:
-        return callback(new MonteCarloTreeSearch(params.id));
+        return callback(new MonteCarloTreeSearch(player.playerId));
       case Q_LEARNING:
-        let qLearning = new QLearning(params);
+        let qLearning = new QLearning(player);
         return qLearning.initData(() => callback(qLearning));
       case RANDOM:
-        return callback(new Random(params.id));
+        return callback(new Random(player.playerId));
       case HUMAN:
-        return callback(new Human(params.id));
+        return callback(new Human(player.playerId));
       default:
-        return callback(new Random(params.id));
+        return callback(new Random(player.playerId));
     }
   }
 }

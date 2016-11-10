@@ -1,7 +1,7 @@
 import Player from "../Player";
 import Game from "../Game";
 
-let id, player1, player2;
+let id, grid, player1, player2;
 
 /**
  * Plays one game and updates the result
@@ -19,7 +19,7 @@ function playGames(current, max, done, progress) {
   if (current === max) {
     done();
   } else{
-    playGame(new Game(id), result => {
+    playGame(new Game(id, grid.columns, grid.rows), result => {
       player1.endGame(result, () => {
         player2.endGame(result, () => {
           progress(result);
@@ -33,6 +33,7 @@ function playGames(current, max, done, progress) {
 module.exports = function (input, done, progress) {
   let {iterations, body} = input;
   id = body.gameId;
+  grid = body.grid;
   Player.create(body.player1, newPlayer1 => {
     player1 = newPlayer1;
     Player.create(body.player2, newPlayer2 => {
