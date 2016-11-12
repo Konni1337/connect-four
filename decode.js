@@ -11,8 +11,8 @@
 
 import fs from "fs";
 import winston from 'winston';
-import dbLayer from "./js/lib/ai/dbLayer/dbLayer";
-import {importedStateToString} from './js/lib/ai/dbLayer/stateToKeyString';
+import dbLayer from "./js/lib/db/dbLayer";
+import {importedStateToString} from './js/lib/db/stateToKeyString';
 
 
 function BufferObject(buffer) {

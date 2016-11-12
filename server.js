@@ -9,6 +9,9 @@ import Player from "./js/lib/Player";
 import threads from 'threads';
 import winston from 'winston';
 import uuid from 'node-uuid';
+import dbLayer from './js/lib/db/dbLayer';
+import fs from 'fs';
+import {STATISTICS_DB_PREFIX} from "./js/constants/config";
 // import decode from './decode';
 
 // Set base paths to thread scripts
@@ -75,7 +78,6 @@ app.post('/scores', (req, res) => {
 app.post('/training', (req, res) => {
   let body = req.body;
   let id = uuid.v1();
-  console.log(id)
   body.gameId = id;
   let iterations = Math.floor(body.iterations / config.THREAD_COUNT);
   scoresMap[id] = Object.assign({}, DEFAULT_STATISTICS);
@@ -135,6 +137,36 @@ app.post('/new-game', (req, res) => {
       }
     });
   });
+});
+
+app.get('/statistics', (req, res) => {
+  const dbFolders = fs.readdirSync('db').filter(function (file) {
+    return fs.statSync(path.join('db', file)).isDirectory();
+  });
+  res.status(200).json({databases: dbFolders.filter(folder => folder.startsWith(STATISTICS_DB_PREFIX))});
+});
+
+app.get('/statistics/:name', (req, res) => {
+  const db = dbLayer.getDatabase(req.params.name);
+  let data = [];
+  db.createReadStream()
+    .on('data', function (keyValue) {
+      const parsedValue = JSON.parse(keyValue.value);
+      const episodes = parseInt(keyValue.key);
+      const wins = parseInt(parsedValue.wins);
+      data.push([episodes, ((wins / episodes) * 100)]);
+    })
+    .on('error', function (err) {
+      console.log('Error in read stream: ', err);
+      res.status(500).json(err);
+    })
+    .on('close', function () {
+      console.log('data fetching finished')
+    })
+    .on('end', function () {
+      data = data.sort((a, b) => a[0] - b[0]);
+      res.status(200).json({data});
+    })
 });
 
 app.post('/move', (req, res) => {

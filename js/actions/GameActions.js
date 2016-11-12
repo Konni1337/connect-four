@@ -13,7 +13,7 @@ export function makeMove(move) {
     }).then(response => response.json())
       .then(json => {
         json = JSON.parse(json);
-        dispatch({type: ActionTypes.UPDATE_GAME, game: json.game, statistics: json.statistics});
+        dispatch({type: ActionTypes.UPDATE_GAME, game: json.game, scores: json.scores});
         dispatch({type: ActionTypes.END_REQUEST});
       })
       .catch(error => {

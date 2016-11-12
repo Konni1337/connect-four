@@ -9,7 +9,7 @@ class AIPlay extends Component {
     grid: PropTypes.arrayOf(
       PropTypes.arrayOf(PropTypes.number.isRequired).isRequired
     ).isRequired,
-    statistics: PropTypes.shape({
+    scores: PropTypes.shape({
       draw: PropTypes.number.isRequired,
       1: PropTypes.number.isRequired,
       2: PropTypes.number.isRequired
@@ -21,10 +21,10 @@ class AIPlay extends Component {
   };
 
   render() {
-    const {grid, isFinished, statistics, makeMove, gameId} = this.props;
+    const {grid, isFinished, scores, makeMove, gameId} = this.props;
     return (
       <div>
-        <Statistics statistics={statistics}/>
+        <Statistics scores={scores}/>
         {!isFinished && <Grid grid={grid} gridWidth={400} handleCellClick={() => {
         }}/>}
         <button className="btn btn-primary ai-move" onClick={() => makeMove({gameId})}>Do AI Move</button>
@@ -39,7 +39,7 @@ export default connect(state => {
     grid: state.game.grid,
     isFinished: state.game.isFinished,
     currentPlayer: state.game.currentPlayer,
-    statistics: state.statistics
+    scores: state.scores
   }
 }, {
   makeMove: GameActions.makeMove

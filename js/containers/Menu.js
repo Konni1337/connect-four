@@ -25,11 +25,14 @@ class Menu extends Component {
             </div>
             <div className="collapse navbar-collapse">
               <ul className="nav navbar-nav">
-                <li className={step === 1 ? 'active' : ''} onClick={() => this.handleChangeStep(1)}><a href="#">Play
-                  Game</a></li>
-                <li className={step === 2 ? 'active' : ''} onClick={() => this.handleChangeStep(2)}><a
-                  href="#">Training</a></li>
-                <li className={step === 3 ? 'active' : ''} onClick={() => this.handleChangeStep(3)}><a href="#">Statistics</a>
+                <li className={step === 1 ? 'active' : ''} onClick={() => this.handleChangeStep(1)}>
+                  <a href="#">Play Game</a>
+                </li>
+                <li className={step === 2 ? 'active' : ''} onClick={() => this.handleChangeStep(2)}>
+                  <a href="#">Training</a>
+                </li>
+                <li className={step === 3 ? 'active' : ''} onClick={() => this.handleChangeStep(3)}>
+                  <a href="#">Statistics</a>
                 </li>
               </ul>
             </div>

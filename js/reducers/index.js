@@ -7,6 +7,7 @@ import gameInfo from './gameInfo';
 import game from './game';
 import scores from './scores';
 import training from './training';
+import statistics from './statistics';
 
 function isLoading(state = false, action) {
   switch (action.type) {
@@ -39,7 +40,8 @@ const appReducer = combineReducers({
   steps,
   isLoading,
   scores,
-  training
+  training,
+  statistics
 });
 
 const rootReducer = (state, action) => {

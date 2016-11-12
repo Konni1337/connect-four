@@ -33,7 +33,9 @@
     "webpack-dev-middleware": "^1.8.4",
     "webpack-hot-middleware": "^2.13.0",
     "whatwg-fetch": "^0.11.0",
-    "winston": "^2.2.0"
+    "winston": "^2.2.0",
+    "zingchart": "^2.5.0",
+    "zingchart-react": "^1.0.5"
   },
   "devDependencies": {
     "autoprefixer": "^6.3.6",
