@@ -1,7 +1,7 @@
 import {getRandomElement} from "../../../helpers/CommonHelper";
-import dbLayer from "../../db/dbLayer";
+import dbLayer from "../../dbLayer/dbLayer";
 import {STATISTICS_DB_PREFIX} from "../../../constants/config";
-import stateToString, {stateActionString} from "../../db/stateToKeyString";
+import stateToString, {stateActionString} from "../../dbLayer/stateToKeyString";
 import Experience from "./Experience";
 import {Q_LEARNING_CONFIG as defaults, DRAW} from "../../../constants/GameFixtures";
 

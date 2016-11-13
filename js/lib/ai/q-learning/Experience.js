@@ -1,9 +1,9 @@
 import 'whatwg-fetch';
 import winston from '../../logger/QLearningLogger';
-import {stateActionString} from "../../db/stateToKeyString";
+import {stateActionString} from "../../dbLayer/stateToKeyString";
 import {PERSIST, INITIAL_QVALUE, STATISTICS_DB_PREFIX} from "../../../constants/config";
 import {getRandomElement} from "../../../helpers/CommonHelper";
-import dbLayer from "../../db/dbLayer";
+import dbLayer from "../../dbLayer/dbLayer";
 
 /**
  * This class is an interface to get and set the experience for the qLearning AI
