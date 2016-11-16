@@ -1,8 +1,9 @@
 import * as ActionTypes from "../constants/ActionTypes";
+import {GRID_HEIGHT, GRID_LENGTH} from "../constants/GameFixtures";
 
 const defaultState = {
-  columns: 7,
-  rows: 7
+  columns: GRID_LENGTH,
+  rows: GRID_HEIGHT
 };
 
 export default function grid(state = defaultState, action) {
