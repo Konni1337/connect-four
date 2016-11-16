@@ -106,8 +106,7 @@ export default class Node {
    */
   utcValue() {
     if (this.visits === 0) return Number.POSITIVE_INFINITY;
-    let value = this.value() + 2 * (1 / Math.sqrt(2)) * Math.sqrt( 2 * Math.log(this.parent.visits) / this.visits);
-    return isNaN(value) ? 0 : value
+    return this.value() + 2 * (1 / Math.sqrt(2)) * Math.sqrt(Math.log(this.parent.visits) / this.visits);
   }
 
   /**
@@ -116,8 +115,7 @@ export default class Node {
    * @returns {number}
    */
   value() {
-    let value = this.wins / this.visits;
-    return isNaN(value) ? 0 : value
+    return this.wins / this.visits
   }
 
   /**
