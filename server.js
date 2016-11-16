@@ -9,7 +9,7 @@ import Player from "./js/lib/Player";
 import threads from 'threads';
 import winston from 'winston';
 import uuid from 'node-uuid';
-import dbLayer from './js/lib/db/dbLayer';
+import dbLayer from './js/lib/dbLayer/dbLayer';
 import fs from 'fs';
 import {STATISTICS_DB_PREFIX} from "./js/constants/config";
 // import decode from './decode';
