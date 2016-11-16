@@ -21,7 +21,7 @@ export default class QLearning {
     this.epsilon = params.epsilon || defaults.DEFAULT_EPSILON;
     this.dynamicAlpha = params.dynamicAlpha || defaults.DEFAULT_DYNAMIC_ALPHA;
     this.e_2 = params.e_2 || defaults.DEFAULT_E_2;
-    this.statisticsDb = dbLayer.getDatabase(STATISTICS_DB_PREFIX + this.id);
+    this.statisticsDb = dbLayer.getDatabase([STATISTICS_DB_PREFIX,this.id, this.playerId].join('-'));
     this.lastStateActionValue = null;
     this.wins = 0;
     this.draws = 0;
@@ -145,8 +145,8 @@ export default class QLearning {
         draws: self.draws
       }), () => {
         if (self.episodes % 1000 === 0) {
-          console.log('current win percentage for ' + self.id + ' is ' + ((self.wins / self.episodes) * 100) + '%');
-          console.log('current draw percentage for ' + self.id + ' is ' + ((self.draws / self.episodes) * 100) + '%');
+          console.log('current win percentage for ' + self.playerId + ' is ' + ((self.wins / self.episodes) * 100) + '%');
+          console.log('current draw percentage for ' + self.playerId + ' is ' + ((self.draws / self.episodes) * 100) + '%');
           self.statisticsDb.put(self.episodes, JSON.stringify({
             wins: self.wins,
             draws: self.draws
