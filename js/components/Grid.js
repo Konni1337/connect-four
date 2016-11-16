@@ -15,7 +15,7 @@ export default class Grid extends Component {
     return <div
       key={index}
       className="column"
-      style={{width: this.cellWidth}}
+      style={{width: this.cellSize}}
       onClick={() => column[0] === 0 && this.props.handleCellClick(index)}>
       {column.reverse().map(this.renderCell.bind(this))}
     </div>
@@ -24,15 +24,14 @@ export default class Grid extends Component {
   renderCell(cellValue, index) {
     return <div
       key={index}
-      style={{height: this.cellHeight}}
-      className={`cell ${cellValue === 0 ? 'white' : cellValue === 1 ? 'red' : 'blue'}`}>
+      style={{height: this.cellSize}}
+      className={`cell ${cellValue === 0 ? 'gray' : cellValue === 1 ? 'white' : 'black'}`}>
     </div>
   }
 
   render() {
     const {grid, gridWidth} = this.props;
-    this.cellWidth = 400 / grid[0].length;
-    this.cellHeight = 400 / grid[0].length;
+    this.cellSize = Math.floor(400 / grid.length);
     return <div className="grid-wrapper" style={{width: gridWidth}}>{grid.map(this.renderColumns.bind(this))}</div>
   }
 };
