@@ -1,4 +1,6 @@
 import Root from "./Root";
+import {BEST_FIRST_MOVE} from "../../../constants/config";
+import stateToString from "../../dbLayer/stateToKeyString";
 
 /**
  * A game AI that uses Monte Carlo Tree Search to find the best move
@@ -10,7 +12,7 @@ export default class MonteCarloTreeSearch {
   }
 
   clone() {
-    return new MonteCarloTreeSearch(this.id, this.maxMilliseconds)
+    return new MonteCarloTreeSearch(this.id, this.maxDepth)
   }
 
   /**
@@ -20,6 +22,9 @@ export default class MonteCarloTreeSearch {
    * @param cb      callback
    */
   selectAction(game, cb) {
+    if (BEST_FIRST_MOVE && parseInt(stateToString(game.grid)) === 0 && game.grid.length === 7) {
+      return callback({index: 3, player: this.playerId});
+    }
     cb(this.selectActionSync(game))
   }
 

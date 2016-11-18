@@ -4,6 +4,7 @@ import {STATISTICS_DB_PREFIX} from "../../../constants/config";
 import stateToString, {stateActionString} from "../../dbLayer/stateToKeyString";
 import Experience from "./Experience";
 import {Q_LEARNING_CONFIG as defaults, DRAW} from "../../../constants/GameFixtures";
+import {BEST_FIRST_MOVE} from "../../../constants/config";
 
 /**
  * This is a Q-Learning AI for the game connect four
@@ -16,11 +17,11 @@ export default class QLearning {
     this.playerId = params.playerId;
     this.rewards = params.rewards || defaults.DEFAULT_REWARDS;
     this.experience = new Experience(this.id);
-    this.alpha_0 = params.alpha_0 || defaults.DEFAULT_ALPHA_0;
-    this.gamma = params.gamma || defaults.DEFAULT_GAMMA;
-    this.epsilon = params.epsilon || defaults.DEFAULT_EPSILON;
+    this.alpha_0 = parseFloat(params.alpha_0) || defaults.DEFAULT_ALPHA_0;
+    this.gamma = parseFloat(params.gamma) || defaults.DEFAULT_GAMMA;
+    this.epsilon = parseFloat(params.epsilon) || defaults.DEFAULT_EPSILON;
     this.dynamicAlpha = params.dynamicAlpha || defaults.DEFAULT_DYNAMIC_ALPHA;
-    this.e_2 = params.e_2 || defaults.DEFAULT_E_2;
+    this.e_2 = parseFloat(params.e_2) || defaults.DEFAULT_E_2;
     this.statisticsDb = dbLayer.getDatabase([STATISTICS_DB_PREFIX,this.id, this.playerId].join('-'));
     this.lastStateActionValue = null;
     this.wins = 0;
@@ -104,7 +105,9 @@ export default class QLearning {
     let self = this,
       possibleActions = game.getValidMoves(),
       state = stateToString(game.grid);
-
+    if (BEST_FIRST_MOVE && parseInt(state) === 0 && game.grid.length === 7) {
+      return callback({index: 3, player: this.playerId});
+    }
     self.experience.bestStateActionValue(state, possibleActions, ({state, action, value}) => {
       self.updateQValue(value, () => {
         // apply epsilon greedy
@@ -112,6 +115,7 @@ export default class QLearning {
           let newAction = getRandomElement(possibleActions);
           self.experience.getQValue(stateActionString(state, newAction), newValue => {
             self.lastStateActionValue = {state, action: newAction, value: newValue};
+            console.log('epsilon triggered');
             callback(newAction);
           });
         } else {

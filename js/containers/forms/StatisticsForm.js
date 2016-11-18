@@ -68,7 +68,10 @@ class StatisticsForm extends Component {
         ],
         legend: "true",
         theme: "light",
-        title: "Winrate every 1000 games"
+        title: "Winrate every 1000 games",
+        "scale-y": {
+          zooming: true
+        }
       };
       return <div>
         {this.renderDatabaseSelect(databases)}

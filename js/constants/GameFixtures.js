@@ -7,6 +7,8 @@ export const GRID_LENGTH = 7;
 export const GRID_HEIGHT = 6;
 export const EMPTY_VALUE = 0;
 
+export const DEFAULT_MAX_DEPTH = 1000;
+
 export const Q_LEARNING_CONFIG = {
   DEFAULT_REWARDS: {
     won: 100,

@@ -1,4 +1,6 @@
 import {getRandomElement} from "../../../helpers/CommonHelper";
+import {BEST_FIRST_MOVE} from "../../../constants/config";
+import stateToString from "../../dbLayer/stateToKeyString";
 /**
  * Human player class
  */
@@ -20,6 +22,9 @@ export default class Random {
    * @param callback
    */
   selectAction(game, callback) {
+    if (BEST_FIRST_MOVE && parseInt(stateToString(game.grid)) === 0 && game.grid.length === 7) {
+      return callback({index: 3, player: this.playerId});
+    }
     return callback(getRandomElement(game.getValidMoves()));
   }
 

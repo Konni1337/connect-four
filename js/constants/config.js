@@ -13,3 +13,5 @@ export const IMPORT_NAME = 'ql-vs-mmmc';
 // Be aware that multithreading might not work for Q-Learning
 export const THREAD_COUNT = 1;
 export const STATISTICS_DB_PREFIX = 'statistics';
+// Always perform the best move on start
+export const BEST_FIRST_MOVE = true;

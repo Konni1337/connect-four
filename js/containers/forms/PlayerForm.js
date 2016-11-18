@@ -13,7 +13,7 @@ class GameStart extends Component {
 
   submitForm(event) {
     event.preventDefault();
-    const {step, changePlayer, handleSubmit, changeStep} = this.props;
+    const {step, changePlayer, changeStep} = this.props;
 
     let formData = new FormData(event.target),
       playerObject = {playerId: step};
