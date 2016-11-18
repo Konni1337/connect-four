@@ -8,7 +8,8 @@ export const INITIAL_QVALUE = 0.0;
 export const LOG_REQUESTS = false;
 // Set to true and change the path to the experience file if you want to import it on server start
 export const IMPORT_ON_LOAD = false;
-export const IMPORT_FILE = '/home/konstantin/Downloads/ql-vs-pql.exp2';
+export const IMPORT_FILE = '/home/ubuntu/Downloads/ql-vs-mmmc.exp2';
+export const IMPORT_NAME = 'ql-vs-mmmc';
 // Be aware that multithreading might not work for Q-Learning
 export const THREAD_COUNT = 1;
 export const STATISTICS_DB_PREFIX = 'statistics';

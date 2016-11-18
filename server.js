@@ -12,7 +12,7 @@ import uuid from 'node-uuid';
 import dbLayer from './js/lib/dbLayer/dbLayer';
 import fs from 'fs';
 import {STATISTICS_DB_PREFIX} from "./js/constants/config";
-// import decode from './decode';
+import decode from './decode';
 
 // Set base paths to thread scripts
 threads.config.set({

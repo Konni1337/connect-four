@@ -11,8 +11,9 @@
 
 import fs from "fs";
 import winston from 'winston';
-import dbLayer from "./js/lib/db/dbLayer";
-import {importedStateToString} from './js/lib/db/stateToKeyString';
+import dbLayer from "./js/lib/dbLayer/dbLayer";
+import {importedStateToString} from './js/lib/dbLayer/stateToKeyString';
+import {IMPORT_NAME} from "./js/constants/config";
 
 
 function BufferObject(buffer) {
@@ -69,7 +70,8 @@ BufferObject.prototype.readDoubleBE = function (offset) {
  */
 function loadData(fileName, callback, progress) {
   let data = {};
-  let db = dbLayer.getDatabase('default');
+  let logValues = [];
+  let db = dbLayer.getDatabase(IMPORT_NAME);
   progress = progress || function (percent) {
     };
 
@@ -100,13 +102,14 @@ function loadData(fileName, callback, progress) {
         let action = buff.readUInt32BE();
         let value = buff.readDoubleBE();
         let stringState = importedStateToString(state, action);
-        // if (state.length === 1) {
-        //   winston.info('state: ' + state + ' action: ' + action);
-        //   winston.info('state: ' + state);
-        //   winston.info('action: ' + action);
-        //   winston.info('value: ' + value);
-        //   winston.info('stringState: ' + stringState);
-        // }
+        if (state.length < 3) {
+          logValues.push({
+            state,
+            stringState,
+            action,
+            value,
+          });
+        }
         data.experience.push({type: 'put', key: stringState, value});
       }
 
@@ -126,6 +129,7 @@ function loadData(fileName, callback, progress) {
         });
       } else {
         process.nextTick(function () {
+          fs.writeFileSync('data.json', JSON.stringify(logValues, null, 2));
           winston.info('finished');
         })
       }

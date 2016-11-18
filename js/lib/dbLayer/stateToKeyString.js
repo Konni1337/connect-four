@@ -23,5 +23,5 @@ export function importedStateToString(state, action) {
     if (isNaN(index)) throw 'index should be a int, but index is ' + index;
     simulatedGame.makeMove({index, player: simulatedGame.currentPlayer})
   });
-  return stateToKeyString({state: simulatedGame.grid, action: {index: action}});
+  return stateActionString(stateToString(simulatedGame.grid), {index: action});
 }
