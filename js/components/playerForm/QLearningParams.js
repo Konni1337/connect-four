@@ -14,7 +14,7 @@ class QLearningParams extends Component {
                inputProps={{defaultValue: Q_LEARNING_CONFIG.DEFAULT_EPSILON}}/>
         <Input id="alpha" name="alpha" label="Alpha" inputProps={{defaultValue: Q_LEARNING_CONFIG.DEFAULT_ALPHA_0}}/>
         <CheckboxWrapped id="dynamic-alpha" name="dynamic-alpha" label="Dynamic Alpha">
-          <Input id="e2" name="e2" label="E2" inputProps={{defaultValue: Q_LEARNING_CONFIG.DEFAULT_DYNAMIC_ALPHA}}/>
+          <Input id="e2" name="e2" label="E2" inputProps={{defaultValue: Q_LEARNING_CONFIG.DEFAULT_E_2}}/>
         </CheckboxWrapped>
       </div>
     )
