@@ -67,7 +67,7 @@ export default class Experience {
    */
   getQValue(key, callback) {
     this.get(key, function (err, value) {
-      if (err) winston.error(err);
+      // if (err) winston.error(err);
       callback(parseFloat(err || isNaN(value) ? INITIAL_QVALUE : value));
     });
   }

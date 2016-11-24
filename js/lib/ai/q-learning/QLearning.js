@@ -115,7 +115,6 @@ export default class QLearning {
           let newAction = getRandomElement(possibleActions);
           self.experience.getQValue(stateActionString(state, newAction), newValue => {
             self.lastStateActionValue = {state, action: newAction, value: newValue};
-            console.log('epsilon triggered');
             callback(newAction);
           });
         } else {
@@ -149,8 +148,22 @@ export default class QLearning {
         draws: self.draws
       }), () => {
         if (self.episodes % 1000 === 0) {
-          console.log('current win percentage for ' + self.playerId + ' is ' + ((self.wins / self.episodes) * 100) + '%');
-          console.log('current draw percentage for ' + self.playerId + ' is ' + ((self.draws / self.episodes) * 100) + '%');
+          console.log('current win percentage by ' + self.episodes + ' episodes for ' + self.playerId + ' is ' + ((self.wins / self.episodes) * 100) + '%');
+          console.log('current draw percentage by ' + self.episodes + ' episodes for ' + self.playerId + ' is ' + ((self.draws / self.episodes) * 100) + '%');
+          var count = 0;
+          this.experience.db.createReadStream()
+            .on('data', function (data) {
+              count +=1 ;
+            })
+            .on('error', function (err) {
+              console.log('Oh my!', err)
+            })
+            .on('close', function () {
+              console.log(count)
+            })
+            .on('end', function () {
+              console.log('Stream ended')
+            });
           self.statisticsDb.put(self.episodes, JSON.stringify({
             wins: self.wins,
             draws: self.draws
