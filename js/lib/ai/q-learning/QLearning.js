@@ -147,27 +147,26 @@ export default class QLearning {
         wins: self.wins,
         draws: self.draws
       }), () => {
-        if (self.episodes % 1000 === 0) {
-          console.log('current win percentage by ' + self.episodes + ' episodes for ' + self.playerId + ' is ' + ((self.wins / self.episodes) * 100) + '%');
-          console.log('current draw percentage by ' + self.episodes + ' episodes for ' + self.playerId + ' is ' + ((self.draws / self.episodes) * 100) + '%');
-          var count = 0;
-          this.experience.db.createReadStream()
-            .on('data', function (data) {
+        if (self.episodes % 10000 === 0) {
+          let count = 0;
+          self.experience.db.createReadStream()
+            .on('data', ignore => {
               count +=1 ;
             })
-            .on('error', function (err) {
+            .on('error', err => {
               console.log('Oh my!', err)
             })
-            .on('close', function () {
-              console.log(count)
+            .on('close', () => {
+              console.log('current win percentage by ' + self.episodes + ' episodes for ' + self.playerId + ' is ' + ((self.wins / self.episodes) * 100) + '%');
+              console.log('current draw percentage by ' + self.episodes + ' episodes for ' + self.playerId + ' is ' + ((self.draws / self.episodes) * 100) + '%');
+              console.log('there are ' + count - 1 + ' unique states in the db')
             })
-            .on('end', function () {
-              console.log('Stream ended')
+            .on('end', () => {
+              self.statisticsDb.put(self.episodes, JSON.stringify({
+                wins: self.wins,
+                draws: self.draws
+              }), () => callback(result))
             });
-          self.statisticsDb.put(self.episodes, JSON.stringify({
-            wins: self.wins,
-            draws: self.draws
-          }), () => callback(result))
         } else {
           callback(result)
         }
