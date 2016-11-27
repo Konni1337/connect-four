@@ -1,4 +1,4 @@
-const level = require('level-party');
+const level = require('level');
 
 class DbLayer {
   constructor() {
