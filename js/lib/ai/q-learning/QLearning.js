@@ -108,21 +108,24 @@ export default class QLearning {
     if (BEST_FIRST_MOVE && parseInt(state) === 0 && game.grid.length === 7) {
       return callback({index: 3, player: this.playerId});
     }
-    self.experience.bestStateActionValue(state, possibleActions, ({state, action, value}) => {
-      self.updateQValue(value, () => {
-        // apply epsilon greedy
-        if (Math.random() < self.epsilon) {
-          let newAction = getRandomElement(possibleActions);
-          self.experience.getQValue(stateActionString(state, newAction), newValue => {
-            self.lastStateActionValue = {state, action: newAction, value: newValue};
-            callback(newAction);
-          });
-        } else {
+
+    // apply epsilon greedy
+    if (Math.random() < self.epsilon) {
+      let action = getRandomElement(possibleActions);
+      self.experience.getQValue(stateActionString(state, action), value => {
+        self.updateQValue(value, () => {
           self.lastStateActionValue = {state, action, value};
           callback(action);
-        }
+        });
       });
-    });
+    } else {
+      self.experience.bestStateActionValue(state, possibleActions, ({state, action, value}) => {
+        self.updateQValue(value, () => {
+          self.lastStateActionValue = {state, action, value};
+          callback(action);
+        });
+      });
+    }
   }
 
   /**
@@ -133,8 +136,9 @@ export default class QLearning {
    */
   endGame(result, callback) {
     let self = this,
-      {state, action, value} = self.lastStateActionValue,
-      newValue = self.calcQValue(value, 0, self.getReward(result));
+      {state, action, value} = self.lastStateActionValue;
+
+    let newValue = self.calcQValue(value, 0, self.getReward(result));
 
     self.experience.setQValue(stateActionString(state, action), newValue, () => {
       self.lastStateActionValue = null;
@@ -159,7 +163,7 @@ export default class QLearning {
             .on('close', () => {
               console.log('current win percentage by ' + self.episodes + ' episodes for ' + self.playerId + ' is ' + ((self.wins / self.episodes) * 100) + '%');
               console.log('current draw percentage by ' + self.episodes + ' episodes for ' + self.playerId + ' is ' + ((self.draws / self.episodes) * 100) + '%');
-              console.log('there are ' + count - 1 + ' unique states in the db')
+              console.log('there are ' + (count - 1).toString() + ' unique states in the db')
             })
             .on('end', () => {
               self.statisticsDb.put(self.episodes, JSON.stringify({
@@ -205,6 +209,7 @@ export default class QLearning {
    * @returns {*}
    */
   calcAlpha() {
-    return this.dynamicAlpha ? this.alpha_0 * Math.pow(0.5, this.episodes / this.e_2) : this.alpha_0;
+    return this.dynamicAlpha ? this.e_2 / (this.e_2  + this.episodes) : this.alpha_0;
+    // return this.dynamicAlpha ? this.alpha_0 * Math.pow(0.5, this.episodes / this.e_2) : this.alpha_0;
   }
 }
