@@ -124,9 +124,6 @@ export default class Node {
    * @returns {Node}
    */
   utcChild() {
-    // this.children.reduce((bestChild, child) =>  {
-    //   return !bestChild || child.utcValue() > bestChild.utcValue() ? child : bestChild
-    // });
     let children = this.children;
     let highest = children[0];
     for (let i = 1, len = children.length; i < len; i++) {
@@ -134,9 +131,5 @@ export default class Node {
       if (child.utcValue() > highest.utcValue()) highest = child;
     }
     return highest;
-  }
-
-  shouldExplore() {
-    return this.hasMovesLeft() || this.isLeaf();
   }
 }

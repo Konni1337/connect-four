@@ -16,7 +16,13 @@ export default class Root extends Node {
    * @returns {number, number}
    */
   bestMove() {
-    return this.bestChild().move;
+    let children = this.children;
+    let highest = children[0];
+    for (let i = 1, len = children.length; i < len; i++) {
+      let child = children[i];
+      if (child.value() > highest.value()) highest = child;
+    }
+    return highest.move;
   }
 
   /**
@@ -25,7 +31,7 @@ export default class Root extends Node {
    * @returns {Node}
    */
   findNodeToExplore(node = this) {
-    while (!node.shouldExplore()) node = node.utcChild();
+    while (!(this.hasMovesLeft() || this.isLeaf())) node = node.utcChild();
     return node.isLeaf() ? node : node.expand();
   }
 
@@ -37,16 +43,6 @@ export default class Root extends Node {
   exploreAndFind(maxDepth) {
     for (let i = 0; i < maxDepth; i++) this.findNodeToExplore().finishRandom();
     return this.bestMove();
-  }
-
-  bestChild() {
-    let children = this.children;
-    let highest = children[0];
-    for (let i = 1, len = children.length; i < len; i++) {
-      let child = children[i];
-      if (child.value() > highest.value()) highest = child;
-    }
-    return highest;
   }
 
   /**
