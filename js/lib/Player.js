@@ -14,7 +14,7 @@ export default class Player {
   static create(player, callback) {
     switch (player.algorithm) {
       case MCTS:
-        return callback(new MonteCarloTreeSearch(player.playerId, player.maxDepth));
+        return callback(new MonteCarloTreeSearch(player.playerId, player.playerId, player.maxDepth));
       case Q_LEARNING:
         let qLearning = new QLearning(player);
         return qLearning.initData(() => callback(qLearning));

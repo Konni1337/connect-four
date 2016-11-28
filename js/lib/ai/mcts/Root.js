@@ -31,7 +31,7 @@ export default class Root extends Node {
    * @returns {Node}
    */
   findNodeToExplore(node = this) {
-    while (!(this.hasMovesLeft() || this.isLeaf())) node = node.utcChild();
+    while (!(node.hasMovesLeft() || node.isLeaf())) node = node.utcChild();
     return node.isLeaf() ? node : node.expand();
   }
 
