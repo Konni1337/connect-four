@@ -7,7 +7,7 @@ describe('MonteCarloTreeSearch', () => {
       let mcts = new MonteCarloTreeSearch(1);
       let mctsClone = mcts.clone();
       T.expect(mcts == mctsClone).toBe(false);
-      T.expect(mcts.id === mctsClone.id && mcts.maxDepth === mctsClone.maxDepth).toBe(true)
+      T.expect(mcts.id === mctsClone.id && mcts.maxIterations === mctsClone.maxIterations).toBe(true)
     });
   });
 
@@ -26,7 +26,7 @@ describe('MonteCarloTreeSearch', () => {
   //     })
   //     let mctsClone = mcts.clone();
   //     expect(mcts == mctsClone).toBe(false);
-  //     expect(mcts.id === mctsClone.id && mcts.maxDepth === mctsClone.maxDepth).toBe(true)
+  //     expect(mcts.id === mctsClone.id && mcts.maxIterations === mctsClone.maxIterations).toBe(true)
   //   });
   // })
 });

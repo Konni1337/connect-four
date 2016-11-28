@@ -6,14 +6,14 @@ import stateToString from "../../dbLayer/stateToKeyString";
  * A game AI that uses Monte Carlo Tree Search to find the best move
  */
 export default class MonteCarloTreeSearch {
-  constructor(id, playerId, maxDepth = 1000) {
+  constructor(id, playerId, maxIterations = 1000) {
     this.id = id;
     this.playerId = playerId;
-    this.maxDepth = maxDepth;
+    this.maxIterations = maxIterations;
   }
 
   clone() {
-    return new MonteCarloTreeSearch(this.id, this.maxDepth)
+    return new MonteCarloTreeSearch(this.id, this.playerId, this.maxIterations)
   }
 
   /**
@@ -35,7 +35,7 @@ export default class MonteCarloTreeSearch {
    * @param game    instance of the game
    */
   selectActionSync(game) {
-    return new Root(game).exploreAndFind(this.maxDepth);
+    return new Root(game).exploreAndFind(this.maxIterations);
   }
 
   /**

@@ -1,6 +1,6 @@
 import Node from './Node';
-import {DRAW} from "../../../constants/GameFixtures";
 import '../../../extensions/arrayExtensions';
+import {getRandomElement} from "../../../helpers/CommonHelper";
 
 /**
  * The root node of the tree for MCTS. It is a special kind of Node, it has no move
@@ -28,8 +28,6 @@ export default class Root extends Node {
     this.visits += 1;
   }
 
-
-
   /**
    * @private
    * Returns the best move
@@ -38,12 +36,13 @@ export default class Root extends Node {
    */
   _bestMove() {
     let children = this.children;
-    let highest = children[0];
+    let highest = [children[0]];
     for (let i = 1, len = children.length; i < len; i++) {
       let child = children[i];
-      if (child.value() > highest.value()) highest = child;
+      if (child.value() === highest[0].value()) highest.push(child);
+      if (child.value() > highest[0].value()) highest = [child];
     }
-    return highest.move;
+    return getRandomElement(highest).move;
   }
 
   /**

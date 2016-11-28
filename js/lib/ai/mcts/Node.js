@@ -47,7 +47,7 @@ export default class Node {
    * @returns {Node}
    */
   expand() {
-    let nextMove = this.unvisitedMoves.pop();
+    let nextMove = getRandomElement(this.unvisitedMoves);
     let child = new Node(this.game.clone().makeMove(nextMove), nextMove, this);
     this.children.push(child);
     return child;
