@@ -42,29 +42,6 @@ export default class Node {
   }
 
   /**
-   * Increments the visits and wins
-   */
-  won() {
-    this.visits = this.visits + 1;
-    this.wins = this.wins + 1;
-  }
-
-  /**
-   * Increments the visits by 1 and wins by 0,5
-   */
-  draw() {
-    this.visits = this.visits + 1;
-    this.wins = this.wins + 0.5;
-  }
-
-  /**
-   * Increments the visits
-   */
-  lost() {
-    this.visits = this.visits + 1;
-  }
-
-  /**
    * Plays the next untried move and creates a child node for the new game state
    * @returns {Node}
    */
@@ -82,11 +59,11 @@ export default class Node {
    */
   update(result) {
     if (result === this.move.player) {
-      this.won();
+      this._won();
     } else if (result === DRAW) {
-      this.draw();
+      this._draw();
     } else {
-      this.lost();
+      this._lost();
     }
     this.parent.update(result);
   }
@@ -106,16 +83,7 @@ export default class Node {
    */
   utcValue() {
     if (this.visits === 0) return Number.POSITIVE_INFINITY;
-    return this.value() + 2 * (1 / Math.sqrt(2)) * Math.sqrt(Math.log(this.parent.visits) / this.visits);
-  }
-
-  /**
-   * Returns the percentage of how many times this node has won
-   *
-   * @returns {number}
-   */
-  value() {
-    return this.wins / this.visits
+    return this._value() + 2 * (1 / Math.sqrt(2)) * Math.sqrt(Math.log(this.parent.visits) / this.visits);
   }
 
   /**
@@ -131,5 +99,46 @@ export default class Node {
       if (child.utcValue() > highest.utcValue()) highest = child;
     }
     return highest;
+  }
+
+
+
+  /**
+   * @private
+   * Increments the visits and wins
+   */
+  _won() {
+    this.visits += 1;
+    this.wins += 1;
+  }
+
+  /**
+   * @private
+   * Increments the visits by 1 and wins by 0,5
+   */
+  _draw() {
+    this.visits += 1;
+    this.wins += 0.5;
+  }
+
+  /**
+   * @private
+   * Increments the visits
+   */
+  _lost() {
+    this.visits += 1;
+  }
+
+
+
+  /**
+   * @private
+   * Returns the percentage of how many times this node has won
+   *
+   * @returns {number}
+   */
+  _value() {
+    if (this.visits === 0) return 0;
+    return this.wins / this.visits
   }
 }

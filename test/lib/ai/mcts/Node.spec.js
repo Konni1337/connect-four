@@ -79,50 +79,50 @@ describe('Node', () => {
     });
   });
 
-  describe('won', () => {
+  describe('_won', () => {
     it('should increment visits', () => {
       let node = new Node(game, move);
       T.expect(node.visits).toBe(0);
-      node.won();
+      node._won();
       T.expect(node.visits).toBe(1);
     });
 
     it('should add win reward', () => {
       let node = new Node(game, move);
       T.expect(node.wins).toBe(0);
-      node.won();
+      node._won();
       T.expect(node.wins).toBe(1);
     });
   });
 
-  describe('draw', () => {
+  describe('_draw', () => {
     it('should increment visits', () => {
       let node = new Node(game, move);
       T.expect(node.visits).toBe(0);
-      node.draw();
+      node._draw();
       T.expect(node.visits).toBe(1);
     });
 
     it('should add the draw reward', () => {
       let node = new Node(game, move);
       T.expect(node.wins).toBe(0);
-      node.draw();
+      node._draw();
       T.expect(node.wins).toBe(0.5);
     });
   });
 
-  describe('lost', () => {
+  describe('_lost', () => {
     it('should increment visits', () => {
       let node = new Node(game, move);
       T.expect(node.visits).toBe(0);
-      node.lost();
+      node._lost();
       T.expect(node.visits).toBe(1);
     });
 
     it('should add the lose reward', () => {
       let node = new Node(game, move);
       T.expect(node.wins).toBe(0);
-      node.lost();
+      node._lost();
       T.expect(node.wins).toBe(0);
     });
   });
@@ -133,7 +133,7 @@ describe('Node', () => {
       let root = new Root(game);
       let rootSpy = T.spyOn(root, 'update');
       let node = new Node(game, move, root);
-      let nodeSpy = T.spyOn(node, 'won');
+      let nodeSpy = T.spyOn(node, '_won');
       node.update(game.currentPlayer);
 
       T.expect(rootSpy.calls.length).toBe(1);
@@ -146,7 +146,7 @@ describe('Node', () => {
       let root = new Root(game);
       let rootSpy = T.spyOn(root, 'update');
       let node = new Node(game, move, root);
-      let nodeSpy = T.spyOn(node, 'draw');
+      let nodeSpy = T.spyOn(node, '_draw');
       node.update(DRAW);
       T.expect(rootSpy.calls.length).toBe(1);
       T.expect(nodeSpy.calls.length).toBe(1);
@@ -158,7 +158,7 @@ describe('Node', () => {
       let root = new Root(game);
       let rootSpy = T.spyOn(root, 'update');
       let node = new Node(game, move, root);
-      let nodeSpy = T.spyOn(node, 'lost');
+      let nodeSpy = T.spyOn(node, '_lost');
       node.update(game.currentPlayer + 1);
       T.expect(rootSpy.calls.length).toBe(1);
       T.expect(nodeSpy.calls.length).toBe(1);
@@ -212,7 +212,7 @@ describe('Node', () => {
       root.visits = 2;
       let node = new Node(game, move, root);
       node.visits = 2;
-      T.expect(T.roundDecimal(node.utcValue(), 9)).toEqual(1.177410023); // calculated by hand
+      T.expect(T.roundDecimal(node.utcValue(), 9)).toEqual(0.832554611); // calculated by hand
     });
 
     it('should return correct utcValue', () => {
@@ -221,21 +221,21 @@ describe('Node', () => {
       let node = new Node(game, move, root);
       node.visits = 2;
       node.wins = 2;
-      T.expect(T.roundDecimal(node.utcValue(), 9)).toEqual(2.177410023); // calculated by hand
+      T.expect(T.roundDecimal(node.utcValue(), 9)).toEqual(1.832554611); // calculated by hand
     });
   });
 
-  describe('value', () => {
+  describe('_value', () => {
     it('should return 0 if visits, value are 0', () => {
       let node = new Node(game, move);
-      T.expect(node.value()).toEqual(0);
+      T.expect(node._value()).toEqual(0);
     });
 
     it('should calculate the win percentage', () => {
       let node = new Node(game, move);
       node.wins = 2;
       node.visits = 5;
-      T.expect(node.value()).toEqual(2 / 5);
+      T.expect(node._value()).toEqual(2 / 5);
     });
   });
 

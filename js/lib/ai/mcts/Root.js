@@ -11,11 +11,32 @@ export default class Root extends Node {
   }
 
   /**
+   * This start a simulation to explore the possible moves and estimate there UTC wins
+   *
+   * @returns {Object} move
+   */
+  exploreAndFind(maxDepth) {
+    for (let i = 0; i < maxDepth; i++) this._findNodeToExplore().finishRandom();
+    return this._bestMove();
+  }
+
+  /**
+   * Updates the statistics for this node by the given result
+   * @param result
+   */
+  update(result) {
+    this.visits += 1;
+  }
+
+
+
+  /**
+   * @private
    * Returns the best move
    *
    * @returns {number, number}
    */
-  bestMove() {
+  _bestMove() {
     let children = this.children;
     let highest = children[0];
     for (let i = 1, len = children.length; i < len; i++) {
@@ -26,36 +47,14 @@ export default class Root extends Node {
   }
 
   /**
+   * @private
    * Finds the a node that should be explored depending on the utc value.
+   *
    * @param {Node} node
    * @returns {Node}
    */
-  findNodeToExplore(node = this) {
+  _findNodeToExplore(node = this) {
     while (!(node.hasMovesLeft() || node.isLeaf())) node = node.utcChild();
     return node.isLeaf() ? node : node.expand();
-  }
-
-  /**
-   * This start a simulation to explore the possible moves and estimate there UTC wins
-   *
-   * @returns {Object} move
-   */
-  exploreAndFind(maxDepth) {
-    for (let i = 0; i < maxDepth; i++) this.findNodeToExplore().finishRandom();
-    return this.bestMove();
-  }
-
-  /**
-   * Updates the statistics for this node by the given result
-   * @param result
-   */
-  update(result) {
-    if (result === this.game.currentPlayer) {
-      this.won();
-    } else if (result === DRAW) {
-      this.draw();
-    } else {
-      this.lost();
-    }
   }
 }
