@@ -1,5 +1,6 @@
 import RandomMCTS from "./RandomMCTS";
 import {DRAW} from "../../../constants/GameFixtures";
+import {getRandomElement} from "../../../helpers/CommonHelper";
 
 export default class Node {
   constructor(game, move, parent) {
@@ -87,18 +88,19 @@ export default class Node {
   }
 
   /**
-   * Returns the child with the highest UTC wins
+   * Returns the child with the highest UTC value. Random when there are multiple.
    *
    * @returns {Node}
    */
   utcChild() {
     let children = this.children;
-    let highest = children[0];
+    let highest = [children[0]];
     for (let i = 1, len = children.length; i < len; i++) {
       let child = children[i];
-      if (child.utcValue() > highest.utcValue()) highest = child;
+      if (child.utcValue() === highest[0].utcValue()) highest.push(child);
+      if (child.utcValue() > highest[0].utcValue()) highest = [child];
     }
-    return highest;
+    return getRandomElement(highest);
   }
 
 
