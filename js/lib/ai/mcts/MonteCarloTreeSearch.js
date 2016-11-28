@@ -23,7 +23,7 @@ export default class MonteCarloTreeSearch {
    */
   selectAction(game, cb) {
     if (BEST_FIRST_MOVE && parseInt(stateToString(game.grid)) === 0 && game.grid.length === 7) {
-      return callback({index: 3, player: this.playerId});
+      return cb({index: 3, player: this.playerId});
     }
     cb(this.selectActionSync(game))
   }
