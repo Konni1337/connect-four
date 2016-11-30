@@ -225,17 +225,17 @@ describe('Node', () => {
     });
   });
 
-  describe('_value', () => {
+  describe('value', () => {
     it('should return 0 if visits, value are 0', () => {
       let node = new Node(game, action);
-      T.expect(node._value()).toEqual(0);
+      T.expect(node.value()).toEqual(0);
     });
 
     it('should calculate the win percentage', () => {
       let node = new Node(game, action);
       node.wins = 2;
       node.visits = 5;
-      T.expect(node._value()).toEqual(2 / 5);
+      T.expect(node.value()).toEqual(2 / 5);
     });
   });
 

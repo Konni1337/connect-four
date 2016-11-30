@@ -84,7 +84,7 @@ export default class Node {
    */
   utcValue() {
     if (this.visits === 0) return Number.POSITIVE_INFINITY;
-    return this._value() + 2 * (1 / Math.sqrt(2)) * Math.sqrt(Math.log(this.parent.visits) / this.visits);
+    return this.value() + 2 * (1 / Math.sqrt(2)) * Math.sqrt(Math.log(this.parent.visits) / this.visits);
   }
 
   /**
@@ -139,7 +139,7 @@ export default class Node {
    *
    * @returns {number}
    */
-  _value() {
+  value() {
     if (this.visits === 0) return 0;
     return this.wins / this.visits
   }
