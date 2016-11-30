@@ -36,29 +36,29 @@ export default class Game {
   }
 
   /**
-   * This method returns all valid moves the current player is allowed to do
+   * This method returns all valid actions the current player is allowed to do
    *
    * @returns {Array.<{number, number}>}
    */
-  getValidMoves() {
-    let grid = this.grid, currentPlayer = this.currentPlayer, moves = [], height = grid[0].length - 1;
+  getValidActions() {
+    let grid = this.grid, currentPlayer = this.currentPlayer, actions = [], height = grid[0].length - 1;
     for (let i = 0, len = grid.length; i < len; i++) {
-      if (grid[i][height] === 0) moves.push({index: i, player: currentPlayer})
+      if (grid[i][height] === 0) actions.push({index: i, player: currentPlayer})
     }
-    return moves;
+    return actions;
   }
 
   /**
-   * Executes the given move
+   * Executes the given action
    *
-   * @param move {Object}
+   * @param action {Object}
    * @returns {Game}
    */
-  makeMove(move) {
-    let column = this.grid[move.index];
+  makeAction(action) {
+    let column = this.grid[action.index];
     let pushIndex = column.findIndex(value => value === 0);
-    if (pushIndex === -1) throw 'Could not make move - column is full';
-    column[pushIndex] = move.player;
+    if (pushIndex === -1) throw 'Could not make action - column is full';
+    column[pushIndex] = action.player;
     let result = Game.findResult(this.grid);
     if (this.isFinished = (result !== -1)) this.result = result;
     this.currentPlayer === 1 ? this.currentPlayer = 2 : this.currentPlayer = 1;

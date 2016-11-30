@@ -12,7 +12,7 @@ let id, grid, player1, player2;
 function playGame(game, callback) {
   if (game.isFinished) return callback(game.result);
   let currentPlayer = game.currentPlayer === 1 ? player1 : player2;
-  return currentPlayer.selectAction(game, move => playGame(game.makeMove(move), callback));
+  return currentPlayer.selectAction(game, action => playGame(game.makeAction(action), callback));
 }
 
 function playGames(current, max, done, progress) {

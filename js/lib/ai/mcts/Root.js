@@ -3,7 +3,7 @@ import '../../../extensions/arrayExtensions';
 import {getRandomElement} from "../../../helpers/CommonHelper";
 
 /**
- * The root node of the tree for MCTS. It is a special kind of Node, it has no move
+ * The root node of the tree for MCTS. It is a special kind of Node, it has no action
  */
 export default class Root extends Node {
   constructor(game) {
@@ -11,13 +11,13 @@ export default class Root extends Node {
   }
 
   /**
-   * This start a simulation to explore the possible moves and estimate there UTC wins
+   * This start a simulation to explore the possible actions and estimate there UTC wins
    *
-   * @returns {Object} move
+   * @returns {Object} action
    */
   exploreAndFind(maxDepth) {
     for (let i = 0; i < maxDepth; i++) this._findNodeToExplore().finishRandom();
-    return this._bestMove();
+    return this._bestAction();
   }
 
   /**
@@ -30,11 +30,11 @@ export default class Root extends Node {
 
   /**
    * @private
-   * Returns the best move
+   * Returns the best action
    *
    * @returns {number, number}
    */
-  _bestMove() {
+  _bestAction() {
     let children = this.children;
     let highest = [children[0]];
     for (let i = 1, len = children.length; i < len; i++) {
@@ -42,7 +42,7 @@ export default class Root extends Node {
       if (child.value() === highest[0].value()) highest.push(child);
       if (child.value() > highest[0].value()) highest = [child];
     }
-    return getRandomElement(highest).move;
+    return getRandomElement(highest).action;
   }
 
   /**
@@ -53,7 +53,7 @@ export default class Root extends Node {
    * @returns {Node}
    */
   _findNodeToExplore(node = this) {
-    while (!(node.hasMovesLeft() || node.isLeaf())) node = node.utcChild();
+    while (!(node.hasActionsLeft() || node.isLeaf())) node = node.utcChild();
     return node.isLeaf() ? node : node.expand();
   }
 }

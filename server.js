@@ -128,9 +128,9 @@ app.post('/new-game', (req, res) => {
       gamesMap[id] = {game, player1, player2};
 
       if (!player1.isHuman() && player2.isHuman()) {
-        // Make initial AI-Move
-        player1.selectAction(game, move => {
-          res.status(200).json(JSON.stringify({game: game.makeMove(move), scores: scoresMap[id]}));
+        // Make initial AI-Action
+        player1.selectAction(game, action => {
+          res.status(200).json(JSON.stringify({game: game.makeAction(action), scores: scoresMap[id]}));
         })
       } else {
         res.status(200).json(JSON.stringify({game: gamesMap[id].game, scores: scoresMap[id]}));
@@ -169,23 +169,23 @@ app.get('/statistics/:name', (req, res) => {
     })
 });
 
-app.post('/move', (req, res) => {
+app.post('/action', (req, res) => {
   let body = req.body;
-  let move = body.move, id = body.gameId;
+  let action = body.action, id = body.gameId;
   let {game, player1, player2} = gamesMap[id];
   if (game.currentPlayer === 2) {
     let tmpPlayer = player1;
     player1 = player2;
     player2 = tmpPlayer;
   }
-  if (player1.isHuman() && move) {
-    if (game.makeMove(move).isFinished) {
+  if (player1.isHuman() && action) {
+    if (game.makeAction(action).isFinished) {
       scoresMap[id][game.result] += 1;
       res.status(200).json(JSON.stringify({game, scores: scoresMap[id]}));
     } else {
       if (!player2.isHuman()) {
-        player2.selectAction(game, move => {
-          if (game.makeMove(move).isFinished) {
+        player2.selectAction(game, action => {
+          if (game.makeAction(action).isFinished) {
             player2.endGame(game.result, () => {
               scoresMap[id][game.result] += 1;
               res.status(200).json(JSON.stringify({game, scores: scoresMap[id]}));
@@ -199,8 +199,8 @@ app.post('/move', (req, res) => {
       }
     }
   } else if (!player1.isHuman() && !player2.isHuman()) {
-    player1.selectAction(game, move => {
-      if (game.makeMove(move).isFinished) {
+    player1.selectAction(game, action => {
+      if (game.makeAction(action).isFinished) {
         let result = game.result;
         player1.endGame(result, () => {
           player2.endGame(result, () => {

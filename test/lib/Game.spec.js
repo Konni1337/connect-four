@@ -35,7 +35,7 @@ describe('Game', () => {
     });
   });
 
-  describe('makeMove', () => {
+  describe('makeAction', () => {
     it('should return false if grid is empty', () => {
       const grid = [
         [0, 0, 0, 0],
@@ -49,13 +49,13 @@ describe('Game', () => {
         [1, 0, 0, 0],
         [0, 0, 0, 0]
       ];
-      let move = {index: 2, player: 1};
+      let action = {index: 2, player: 1};
       let game = new Game();
       game.grid = grid;
-      T.expect(game.makeMove(move).grid).toEqual(gridAfter)
+      T.expect(game.makeAction(action).grid).toEqual(gridAfter)
     });
 
-    it('should execute the move', () => {
+    it('should execute the action', () => {
       const grid = [
         [0, 0, 0, 0],
         [0, 0, 0, 0],
@@ -68,10 +68,10 @@ describe('Game', () => {
         [1, 0, 0, 0],
         [0, 0, 0, 0]
       ];
-      let move = {index: 2, player: 1};
+      let action = {index: 2, player: 1};
       let game = new Game();
       game.grid = grid;
-      T.expect(game.makeMove(move).grid).toEqual(gridAfter)
+      T.expect(game.makeAction(action).grid).toEqual(gridAfter)
     });
 
     it('should throw error if column is full', () => {
@@ -81,10 +81,10 @@ describe('Game', () => {
         [0, 0, 0, 0],
         [1, 1, 2, 1]
       ];
-      let move = {index: 3, player: 2};
+      let action = {index: 3, player: 2};
       let game = new Game();
       game.grid = grid;
-      T.expect(() => game.makeMove(move)).toThrow()
+      T.expect(() => game.makeAction(action)).toThrow()
     });
 
     it('should not change isFinished if no one finished', () => {
@@ -94,36 +94,36 @@ describe('Game', () => {
         [1, 2, 0, 0],
         [1, 2, 0, 0]
       ];
-      let move = {index: 3, player: 1};
+      let action = {index: 3, player: 1};
       let game = new Game();
       game.grid = grid;
-      T.expect(game.makeMove(move).isFinished).toBe(false)
+      T.expect(game.makeAction(action).isFinished).toBe(false)
     });
 
-    it('should change isFinished to true if the move finishes the game', () => {
+    it('should change isFinished to true if the action finishes the game', () => {
       const grid = [
         [0, 0, 0, 0],
         [1, 2, 0, 0],
         [1, 2, 0, 0],
         [1, 2, 0, 0]
       ];
-      let move = {index: 0, player: 1};
+      let action = {index: 0, player: 1};
       let game = new Game();
       game.grid = grid;
-      T.expect(game.makeMove(move).isFinished).toBe(true)
+      T.expect(game.makeAction(action).isFinished).toBe(true)
     });
 
-    it('should set result if with the move a player wins', () => {
+    it('should set result if with the action a player wins', () => {
       const grid = [
         [2, 1, 2, 1],
         [1, 2, 1, 0],
         [1, 2, 2, 1],
         [1, 1, 2, 1]
       ];
-      let move = {index: 1, player: 1};
+      let action = {index: 1, player: 1};
       let game = new Game();
       game.grid = grid;
-      T.expect(game.makeMove(move).result).toBe(1)
+      T.expect(game.makeAction(action).result).toBe(1)
     });
 
     it('should set result to draw if grid is full and no one wins', () => {
@@ -133,14 +133,14 @@ describe('Game', () => {
         [1, 2, 2, 1],
         [1, 1, 2, 1]
       ];
-      let move = {index: 1, player: 2};
+      let action = {index: 1, player: 2};
       let game = new Game();
       game.grid = grid;
-      T.expect(game.makeMove(move).result).toBe(DRAW)
+      T.expect(game.makeAction(action).result).toBe(DRAW)
     });
   });
 
-  describe('getValidMoves', () => {
+  describe('getValidActions', () => {
     it('should return all column indices for player 1 if grid is empty', () => {
       const grid = [
         [0, 0, 0, 0],
@@ -148,7 +148,7 @@ describe('Game', () => {
         [0, 0, 0, 0],
         [0, 0, 0, 0]
       ];
-      const validMoves = [
+      const validActions = [
         {index: 0, player: 1},
         {index: 1, player: 1},
         {index: 2, player: 1},
@@ -156,7 +156,7 @@ describe('Game', () => {
       ];
       let game = new Game();
       game.grid = grid;
-      T.expect(game.getValidMoves()).toEqual(validMoves)
+      T.expect(game.getValidActions()).toEqual(validActions)
     });
 
     it('should return all column indices for player 2 if grid is empty and current player is 2', () => {
@@ -166,7 +166,7 @@ describe('Game', () => {
         [0, 0, 0, 0],
         [0, 0, 0, 0]
       ];
-      const validMoves = [
+      const validActions = [
         {index: 0, player: 2},
         {index: 1, player: 2},
         {index: 2, player: 2},
@@ -175,7 +175,7 @@ describe('Game', () => {
       let game = new Game();
       game.currentPlayer = 2;
       game.grid = grid;
-      T.expect(game.getValidMoves()).toEqual(validMoves)
+      T.expect(game.getValidActions()).toEqual(validActions)
     });
 
     it('should return only column indices for columns that have space', () => {
@@ -185,14 +185,14 @@ describe('Game', () => {
         [0, 0, 0, 0],
         [2, 1, 2, 0]
       ];
-      const validMoves = [
+      const validActions = [
         {index: 0, player: 1},
         {index: 2, player: 1},
         {index: 3, player: 1}
       ];
       let game = new Game();
       game.grid = grid;
-      T.expect(game.getValidMoves()).toEqual(validMoves)
+      T.expect(game.getValidActions()).toEqual(validActions)
     });
 
     it('should return only column indices for columns that have space for player 2 if current player is 2', () => {
@@ -202,14 +202,14 @@ describe('Game', () => {
         [0, 0, 0, 0],
         [2, 1, 2, 2]
       ];
-      const validMoves = [
+      const validActions = [
         {index: 0, player: 2},
         {index: 2, player: 2}
       ];
       let game = new Game();
       game.currentPlayer = 2;
       game.grid = grid;
-      T.expect(game.getValidMoves()).toEqual(validMoves)
+      T.expect(game.getValidActions()).toEqual(validActions)
     });
 
     it('should return empty array if grid is full', () => {
@@ -222,7 +222,7 @@ describe('Game', () => {
       let game = new Game();
       game.currentPlayer = 2;
       game.grid = grid;
-      T.expect(game.getValidMoves()).toEqual([])
+      T.expect(game.getValidActions()).toEqual([])
     });
   });
 

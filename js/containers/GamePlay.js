@@ -7,7 +7,7 @@ import Grid from '../components/Grid';
 class GamePlay extends Component {
 
   handleColumnClick(gameId, currentPlayer) {
-    return (index) => this.props.makeMove({gameId: gameId, move: {player: currentPlayer, index}});
+    return (index) => this.props.makeAction({gameId: gameId, action: {player: currentPlayer, index}});
   }
 
   render() {
@@ -29,5 +29,5 @@ export default connect(state => {
     scores: state.scores
   };
 }, {
-  makeMove: GameActions.makeMove
+  makeAction: GameActions.makeAction
 })(GamePlay)

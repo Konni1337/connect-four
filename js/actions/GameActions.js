@@ -3,13 +3,13 @@ require('es6-promise').polyfill();
 import 'whatwg-fetch';
 
 
-export function makeMove(move) {
+export function makeAction(action) {
   return dispatch => {
     dispatch({type: ActionTypes.START_REQUEST});
-    return fetch('/move', {
+    return fetch('/action', {
       method: 'POST',
       headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-      body: JSON.stringify(move)
+      body: JSON.stringify(action)
     }).then(response => response.json())
       .then(json => {
         json = JSON.parse(json);

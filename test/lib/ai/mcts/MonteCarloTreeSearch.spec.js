@@ -21,7 +21,7 @@ describe('MonteCarloTreeSearch', () => {
   //       [0, 0, 0, 0],
   //       [0, 0, 0, 0]
   //     ];
-  //     mcts.selectAction(game, move => {
+  //     mcts.selectAction(game, action => {
   //
   //     })
   //     let mctsClone = mcts.clone();

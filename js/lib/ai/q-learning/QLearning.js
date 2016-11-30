@@ -4,7 +4,7 @@ import {STATISTICS_DB_PREFIX} from "../../../constants/config";
 import stateToString, {stateActionString} from "../../dbLayer/stateToKeyString";
 import Experience from "./Experience";
 import {Q_LEARNING_CONFIG as defaults, DRAW} from "../../../constants/GameFixtures";
-import {BEST_FIRST_MOVE} from "../../../constants/config";
+import {BEST_FIRST_ACTION} from "../../../constants/config";
 
 /**
  * This is a Q-Learning AI for the game connect four
@@ -103,9 +103,9 @@ export default class QLearning {
    */
   selectAction(game, callback) {
     let self = this,
-      possibleActions = game.getValidMoves(),
+      possibleActions = game.getValidActions(),
       state = stateToString(game.grid);
-    if (BEST_FIRST_MOVE && parseInt(state) === 0 && game.grid.length === 7) {
+    if (BEST_FIRST_ACTION && parseInt(state) === 0 && game.grid.length === 7) {
       return callback({index: 3, player: this.playerId});
     }
 

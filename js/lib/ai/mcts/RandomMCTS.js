@@ -7,17 +7,17 @@ import Game from '../../Game';
 export default class RandomMCTS {
   static playUntilFinished(game) {
     while (!game.isFinished) {
-      let finishMove = this.findFinishMove(game.grid, game.currentPlayer);
-      if (finishMove.index !== -1) {
-        game.makeMove(finishMove);
+      let finishAction = this.findFinishAction(game.grid, game.currentPlayer);
+      if (finishAction.index !== -1) {
+        game.makeAction(finishAction);
       } else {
-        game.makeMove(getRandomElement(game.getValidMoves()));
+        game.makeAction(getRandomElement(game.getValidActions()));
       }
     }
     return game.result;
   }
 
-  static findFinishMove(grid, player) {
+  static findFinishAction(grid, player) {
     let result = -1;
     for (let x = 0, len = grid.length; x < len; x++) {
       let y = grid[x].findIndex(value => value === 0);

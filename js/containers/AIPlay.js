@@ -17,17 +17,17 @@ class AIPlay extends Component {
     gameId: PropTypes.string.isRequired,
     isFinished: PropTypes.bool.isRequired,
     currentPlayer: PropTypes.number.isRequired,
-    makeMove: PropTypes.func.isRequired
+    makeAction: PropTypes.func.isRequired
   };
 
   render() {
-    const {grid, isFinished, scores, makeMove, gameId} = this.props;
+    const {grid, isFinished, scores, makeAction, gameId} = this.props;
     return (
       <div>
         <Statistics scores={scores}/>
         {!isFinished && <Grid grid={grid} gridWidth={400} handleCellClick={() => {
         }}/>}
-        <button className="btn btn-primary ai-move" onClick={() => makeMove({gameId})}>Do AI Move</button>
+        <button className="btn btn-primary ai-action" onClick={() => makeAction({gameId})}>Do AI Action</button>
       </div>
     )
   }
@@ -42,5 +42,5 @@ export default connect(state => {
     scores: state.scores
   }
 }, {
-  makeMove: GameActions.makeMove
+  makeAction: GameActions.makeAction
 })(AIPlay)

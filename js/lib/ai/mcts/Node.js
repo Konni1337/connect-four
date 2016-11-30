@@ -3,24 +3,24 @@ import {DRAW} from "../../../constants/GameFixtures";
 import {getRandomElement} from "../../../helpers/CommonHelper";
 
 export default class Node {
-  constructor(game, move, parent) {
+  constructor(game, action, parent) {
     this.game = game;
-    this.move = move;
+    this.action = action;
     this.parent = parent;
     this.wins = 0;
     this.visits = 0;
     this.children = [];
-    this.unvisitedMoves = game.getValidMoves();
+    this.unvisitedActions = game.getValidActions();
   }
 
   clone() {
-    let move = this.move && JSON.parse(JSON.stringify(this.move));
-    let node = new Node(this.game.clone(), move);
+    let action = this.action && JSON.parse(JSON.stringify(this.action));
+    let node = new Node(this.game.clone(), action);
     node.parent = this.parent && this.parent.clone();
     node.wins = this.wins;
     node.visits = this.visits;
     node.children = this.children.map(child => child.clone());
-    node.unvisitedMoves = this.unvisitedMoves.slice();
+    node.unvisitedActions = this.unvisitedActions.slice();
     return node;
   }
 
@@ -34,21 +34,21 @@ export default class Node {
   }
 
   /**
-   * Returns true if all moves have been visited at least once
+   * Returns true if all actions have been visited at least once
    *
    * @returns {boolean}
    */
-  hasMovesLeft() {
-    return this.unvisitedMoves.length > 0
+  hasActionsLeft() {
+    return this.unvisitedActions.length > 0
   }
 
   /**
-   * Plays the next untried move and creates a child node for the new game state
+   * Plays the next untried action and creates a child node for the new game state
    * @returns {Node}
    */
   expand() {
-    let nextMove = getRandomElement(this.unvisitedMoves);
-    let child = new Node(this.game.clone().makeMove(nextMove), nextMove, this);
+    let nextAction = getRandomElement(this.unvisitedActions);
+    let child = new Node(this.game.clone().makeAction(nextAction), nextAction, this);
     this.children.push(child);
     return child;
   }
@@ -59,7 +59,7 @@ export default class Node {
    * @param result {number || DRAW}
    */
   update(result) {
-    if (result === this.move.player) {
+    if (result === this.action.player) {
       this._won();
     } else if (result === DRAW) {
       this._draw();
@@ -78,7 +78,7 @@ export default class Node {
   }
 
   /**
-   * Returns the UTC wins for this move
+   * Returns the UTC wins for this action
    *
    * @returns {number}
    */
