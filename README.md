@@ -1,10 +1,11 @@
 
 # Connect Four With AI
 
-This is the popular game Connect Four implemented with NodeJS and React/Redux. You can play against another Player or
+This is the popular game Connect Four implemented with NodeJS 6.9.1 and React 15.0.2/Redux 3.5.2. You can play against another Player or
 AI. There currently two different AI's in the game:
 * Q-Learning
 * Monte Carlo Tree Search
+
 It is also possible to start training sessions for the AI or to let two AI's play against each other.
 
 ## Getting Started
