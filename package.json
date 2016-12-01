@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "start": "DEBUG=true nodemon server.js --exec babel-node --presets es2015,stage-2",
+    "ws-debug": "nodemon server.js --debug-brk=4574 --exec babel-node --presets es2015,stage-2",
     "build": "webpack -p --config webpack.production.js",
     "build-test": "NODE_ENV=production webpack -p --config webpack.testing.js --colors",
     "build-dev": "webpack -d",
