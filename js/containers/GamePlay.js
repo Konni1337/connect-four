@@ -13,9 +13,11 @@ class GamePlay extends Component {
   render() {
     const {grid, isFinished, scores, gameId, currentPlayer} = this.props;
     return <div>
-      {isFinished && "Finished!"}
       <ScoreBoard scores={scores}/>
-      <Grid grid={grid} gridWidth={400} handleCellClick={this.handleColumnClick(gameId, currentPlayer)}/>
+      <Grid grid={grid} gridWidth={400} isFinished={isFinished}
+            handleCellClick={this.handleColumnClick(gameId, currentPlayer)}/>
+      {isFinished &&
+      <div style={{width: '50%', margin: '40px auto 20px'}} className="alert alert-success" role="alert">Game Finished!</div>}
     </div>
   }
 }

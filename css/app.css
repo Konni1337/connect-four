@@ -24,7 +24,6 @@
 .cell {
     border: 1px solid black;
     width: 100%;
-    cursor: pointer;
 }
 
 .white {
@@ -228,4 +227,13 @@
         -webkit-transform: scale(1);
         transform: scale(1);
     }
+}
+
+.form-horizontal {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+hr {
+  border-color: #222;
 }

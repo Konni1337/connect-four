@@ -119,12 +119,12 @@ function trainingCheck(training, res) {
 app.post('/new-game', (req, res) => {
   console.log(JSON.stringify(req.body, null, 2));
   let body = req.body,
-    id = uuid.v1(),
+    id = body.gameId || uuid.v1(),
     game = new Game(id, body.grid.columns, body.grid.rows);
 
   Player.create(body.player1, player1 => {
     Player.create(body.player2, player2 => {
-      scoresMap[id] = Object.assign({}, DEFAULT_STATISTICS);
+      scoresMap[id] = scoresMap[id] || Object.assign({}, DEFAULT_STATISTICS);
       gamesMap[id] = {game, player1, player2};
 
       if (!player1.isHuman() && player2.isHuman()) {

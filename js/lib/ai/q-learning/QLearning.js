@@ -4,7 +4,7 @@ import {STATISTICS_DB_PREFIX} from "../../../constants/config";
 import stateToString, {stateActionString} from "../../dbLayer/stateToKeyString";
 import Experience from "./Experience";
 import {Q_LEARNING_CONFIG as defaults, DRAW} from "../../../constants/GameFixtures";
-import {BEST_FIRST_ACTION} from "../../../constants/config";
+import {BEST_FIRST_ACTION, EPISODES_NEEDED_FOR_STATISTICS_UPDATE} from "../../../constants/config";
 
 /**
  * This is a Q-Learning AI for the game connect four
@@ -13,16 +13,15 @@ export default class QLearning {
   id = null;
 
   constructor(params) {
-    this.id = params.db;
+    this.id = params.id;
     this.playerId = params.playerId;
     this.rewards = params.rewards || defaults.DEFAULT_REWARDS;
     this.experience = new Experience(this.id);
-    this.alpha_0 = parseFloat(params.alpha_0) || defaults.DEFAULT_ALPHA_0;
+    this.alpha_0 = parseFloat(params.alpha_0) || defaults.DEFAULT_ALPHA;
     this.gamma = parseFloat(params.gamma) || defaults.DEFAULT_GAMMA;
     this.epsilon = parseFloat(params.epsilon) || defaults.DEFAULT_EPSILON;
     this.dynamicAlpha = params.dynamicAlpha || defaults.DEFAULT_DYNAMIC_ALPHA;
-    this.e_2 = parseFloat(params.e_2) || defaults.DEFAULT_E_2;
-    this.statisticsDb = dbLayer.getDatabase([STATISTICS_DB_PREFIX,this.id, this.playerId].join('-'));
+    this.statisticsDb = dbLayer.getDatabase([STATISTICS_DB_PREFIX, this.id, this.playerId].join('-'));
     this.lastStateActionValue = null;
     this.wins = 0;
     this.draws = 0;
@@ -151,26 +150,33 @@ export default class QLearning {
         wins: self.wins,
         draws: self.draws
       }), () => {
-        if (self.episodes % 10000 === 0) {
-          let count = 0;
-          self.experience.db.createReadStream()
-            .on('data', ignore => {
-              count +=1 ;
-            })
-            .on('error', err => {
-              console.log('Oh my!', err)
-            })
-            .on('close', () => {
-              console.log('current win percentage by ' + self.episodes + ' episodes for ' + self.playerId + ' is ' + ((self.wins / self.episodes) * 100) + '%');
-              console.log('current draw percentage by ' + self.episodes + ' episodes for ' + self.playerId + ' is ' + ((self.draws / self.episodes) * 100) + '%');
-              console.log('there are ' + (count - 1).toString() + ' unique states in the db')
-            })
-            .on('end', () => {
-              self.statisticsDb.put(self.episodes, JSON.stringify({
-                wins: self.wins,
-                draws: self.draws
-              }), () => callback(result))
-            });
+        if (self.episodes % EPISODES_NEEDED_FOR_STATISTICS_UPDATE === 0) {
+          self.statisticsDb.put(self.episodes, JSON.stringify({
+            wins: self.wins,
+            draws: self.draws
+          }), () => {
+            if (self.episodes % (EPISODES_NEEDED_FOR_STATISTICS_UPDATE * 100) === 0) {
+              let count = 0;
+              self.experience.db.createReadStream()
+                .on('data', ignore => {
+                  count += 1;
+                })
+                .on('error', err => {
+                  console.log('Oh my!', err)
+                })
+                .on('close', () => {
+                  console.log('current win percentage by ' + self.episodes + ' episodes for ' + self.playerId + ' is ' + ((self.wins / self.episodes) * 100) + '%');
+                  console.log('current draw percentage by ' + self.episodes + ' episodes for ' + self.playerId + ' is ' + ((self.draws / self.episodes) * 100) + '%');
+                  console.log('there are ' + (count - 1).toString() + ' unique states in the db')
+                })
+                .on('end', () => {
+                  callback(result)
+                });
+            } else {
+              callback(result)
+            }
+          })
+
         } else {
           callback(result)
         }
@@ -209,7 +215,7 @@ export default class QLearning {
    * @returns {*}
    */
   calcAlpha() {
-    return this.dynamicAlpha ? this.e_2 / (this.e_2  + this.episodes) : this.alpha_0;
+    return this.dynamicAlpha ? this.alpha_0 / (this.alpha_0 + this.episodes) : this.alpha_0;
     // return this.dynamicAlpha ? this.alpha_0 * Math.pow(0.5, this.episodes / this.e_2) : this.alpha_0;
   }
 }

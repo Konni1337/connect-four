@@ -42,6 +42,7 @@ export default class Root extends Node {
       if (child.value() === highest[0].value()) highest.push(child);
       if (child.value() > highest[0].value()) highest = [child];
     }
+
     return getRandomElement(highest).action;
   }
 

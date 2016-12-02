@@ -7,6 +7,7 @@ export default class Grid extends Component {
       PropTypes.arrayOf(PropTypes.number.isRequired).isRequired
     ).isRequired,
     gridWidth: PropTypes.number.isRequired,
+    isFinished: PropTypes.bool.isRequired,
     handleCellClick: PropTypes.func.isRequired
   };
 
@@ -16,16 +17,18 @@ export default class Grid extends Component {
       key={index}
       className="column"
       style={{width: this.cellSize}}
-      onClick={() => column[0] === 0 && this.props.handleCellClick(index)}>
+      onClick={() => column[0] === 0 && !this.props.isFinished && this.props.handleCellClick(index)}>
       {column.reverse().map(this.renderCell.bind(this))}
     </div>
   }
 
   renderCell(cellValue, index) {
+    const isEmpty = cellValue === 0;
+    
     return <div
       key={index}
-      style={{height: this.cellSize}}
-      className={`cell ${cellValue === 0 ? 'gray' : cellValue === 1 ? 'white' : 'black'}`}>
+      style={{height: this.cellSize, cursor: !isEmpty || this.props.isFinished ? 'auto' : 'pointer'}}
+      className={`cell ${isEmpty ? 'gray' : cellValue === 1 ? 'white' : 'black'}`}>
     </div>
   }
 

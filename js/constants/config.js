@@ -12,6 +12,11 @@ export const IMPORT_FILE = '/home/ubuntu/Downloads/ql-vs-mmmc.exp2';
 export const IMPORT_NAME = 'ql-vs-mmmc';
 // Be aware that multithreading might not work for Q-Learning
 export const THREAD_COUNT = 1;
-export const STATISTICS_DB_PREFIX = 'statistics';
+// Db prefixes
+export const STATISTICS_DB_PREFIX = 'stat';
+export const MCTS_DB_PREFIX = 'mcts';
+export const QL_DB_PREFIX = 'ql';
 // Always perform the best action on start
 export const BEST_FIRST_ACTION = true;
+// A statistics snapshot will be made every n episodes
+export const EPISODES_NEEDED_FOR_STATISTICS_UPDATE = 1000;

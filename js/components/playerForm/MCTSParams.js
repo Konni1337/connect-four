@@ -10,7 +10,12 @@ class MCTSParams extends Component {
 
     return (
       <div className="mcts-params">
+        <hr style={{position: 'absolute', left: '10%', width: '80%'}} />
+        <div style={{paddingTop: '55px'}}></div>
+        <Input id="id" name="id" label="Id" inputProps={{defaultValue: "MCTS"}}/>
         <Input id="max-depth" name="maxDepth" label="Turns Per Action" inputProps={{defaultValue: DEFAULT_MAX_DEPTH}}/>
+        <hr style={{position: 'absolute', left: '10%', width: '80%'}} />
+        <div style={{paddingTop: '55px'}}></div>
       </div>
     )
   }

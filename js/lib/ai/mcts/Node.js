@@ -1,6 +1,6 @@
 import RandomMCTS from "./RandomMCTS";
 import {DRAW} from "../../../constants/GameFixtures";
-import {getRandomElement} from "../../../helpers/CommonHelper";
+import {removeRandomElement, getRandomElement} from "../../../helpers/CommonHelper";
 
 export default class Node {
   constructor(game, action, parent) {
@@ -47,7 +47,7 @@ export default class Node {
    * @returns {Node}
    */
   expand() {
-    let nextAction = getRandomElement(this.unvisitedActions);
+    let nextAction = removeRandomElement(this.unvisitedActions);
     let child = new Node(this.game.clone().makeAction(nextAction), nextAction, this);
     this.children.push(child);
     return child;

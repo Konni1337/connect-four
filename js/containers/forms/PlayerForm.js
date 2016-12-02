@@ -33,7 +33,7 @@ class GameStart extends Component {
         {step === 1 &&
         <form className="form-horizontal small-form" onSubmit={this.submitForm.bind(this)}>
           <PlayerInputs title="Player 1" isTraining={isTraining}/>
-          <div>
+          <div className="form-controls">
             <button className="btn btn-default" onClick={event => this.onBackClick(event, handleBack)}>
               Back
             </button>
@@ -43,7 +43,7 @@ class GameStart extends Component {
         {step === 2 &&
         <form className="form-horizontal small-form" onSubmit={this.submitForm.bind(this)}>
           <PlayerInputs title="Player 2" isTraining={isTraining}/>
-          <div>
+          <div className="form-controls">
             <button className="btn btn-default" onClick={event => this.onBackClick(event, () => changeStep(1))}>
               Back
             </button>
@@ -51,7 +51,7 @@ class GameStart extends Component {
           </div>
         </form>}
         {step === 3 &&
-        <div>
+        <div className="form-controls">
           <button className="btn btn-default" onClick={() => changeStep(2)}>
             Back
           </button>

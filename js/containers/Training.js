@@ -13,8 +13,14 @@ class Training extends Component {
     const {isFinished, scores, reset} = this.props;
     return (
       <div>
-        {!isFinished && <span>Training still running</span>}
-        {isFinished && <span>Training is finished</span>}
+        {!isFinished &&
+        <div style={{width: '50%', margin: '0 auto 20px'}} className="alert alert-warning" role="alert">
+          Training still running!
+        </div>}
+        {isFinished &&
+        <div style={{width: '50%', margin: '0 auto 20px'}} className="alert alert-success" role="alert">
+          Training is finished!
+        </div>}
         <ScoreBoard scores={scores}/>
         {isFinished &&
         <button className="btn btn-default" onClick={reset}>Reset</button>}

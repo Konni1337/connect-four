@@ -1,7 +1,7 @@
 import 'whatwg-fetch';
 import winston from '../../logger/QLearningLogger';
 import {stateActionString} from "../../dbLayer/stateToKeyString";
-import {PERSIST, INITIAL_QVALUE, STATISTICS_DB_PREFIX} from "../../../constants/config";
+import {PERSIST, INITIAL_QVALUE, QL_DB_PREFIX} from "../../../constants/config";
 import {getRandomElement} from "../../../helpers/CommonHelper";
 import dbLayer from "../../dbLayer/dbLayer";
 
@@ -14,9 +14,8 @@ export default class Experience {
   persist = false;
 
   constructor(id) {
-    if (id.startsWith(STATISTICS_DB_PREFIX)) throw 'agent id cant start with ' + STATISTICS_DB_PREFIX;
     this.id = id;
-    this.db = dbLayer.getDatabase(id);
+    this.db = dbLayer.getDatabase([QL_DB_PREFIX, id].join('-'));
     this.persist = process.env.NODE_ENV !== 'test' && PERSIST;
   }
 
