@@ -109,22 +109,37 @@ export default class QLearning {
     }
 
     // apply epsilon greedy
-    if (Math.random() < self.epsilon) {
-      let action = getRandomElement(possibleActions);
-      self.experience.getQValue(stateActionString(state, action), value => {
-        self.updateQValue(value, () => {
+    // if (Math.random() < self.epsilon) {
+    //   let action = getRandomElement(possibleActions);
+    //   self.experience.getQValue(stateActionString(state, action), value => {
+    //     self.updateQValue(value, () => {
+    //       self.lastStateActionValue = {state, action, value};
+    //       callback(action);
+    //     });
+    //   });
+    // } else {
+    //   self.experience.bestStateActionValue(state, possibleActions, ({state, action, value}) => {
+    //     self.updateQValue(value, () => {
+    //       self.lastStateActionValue = {state, action, value};
+    //       callback(action);
+    //     });
+    //   });
+    // }
+    self.experience.bestStateActionValue(state, possibleActions, ({state, action, value}) => {
+      self.updateQValue(value, () => {
+        // apply epsilon greedy
+        if (Math.random() < self.epsilon) {
+          let newAction = getRandomElement(possibleActions);
+          self.experience.getQValue(stateActionString(state, newAction), newValue => {
+            self.lastStateActionValue = {state, action: newAction, value: newValue};
+            callback(newAction);
+          });
+        } else {
           self.lastStateActionValue = {state, action, value};
           callback(action);
-        });
+        }
       });
-    } else {
-      self.experience.bestStateActionValue(state, possibleActions, ({state, action, value}) => {
-        self.updateQValue(value, () => {
-          self.lastStateActionValue = {state, action, value};
-          callback(action);
-        });
-      });
-    }
+    });
   }
 
   /**
