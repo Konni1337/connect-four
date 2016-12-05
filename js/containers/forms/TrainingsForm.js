@@ -14,7 +14,7 @@ class TrainingsForm extends Component {
   }
 
   render() {
-    const {step, changeStep, handleBack, handleSubmit, changeIterations, iterations} = this.props;
+    const {step, changeStep, handleSubmit, changeIterations, iterations} = this.props;
 
     return (
       <div>

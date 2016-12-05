@@ -1,6 +1,6 @@
 import * as ActionTypes from "../constants/ActionTypes";
 
-const defaultState = {iterations: 1000000, isFinished: false};
+const defaultState = {iterations: 250000, isFinished: false};
 
 export default function training(state = defaultState, action) {
   switch (action.type) {

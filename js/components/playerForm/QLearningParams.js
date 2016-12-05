@@ -10,7 +10,7 @@ class QLearningParams extends Component {
       <div className="q-learning-params">
         <hr style={{position: 'absolute', left: '10%', width: '80%'}} />
         <div style={{paddingTop: '55px'}}></div>
-        <Input id="id" name="id" label="Id" inputProps={{defaultValue: "Q-Learning"}}/>
+        <Input id="id" name="id" label="Id" inputProps={{defaultValue: "Q-Learning2"}}/>
         <Input id="gamma" name="gamma" label="Gamma" inputProps={{defaultValue: Q_LEARNING_CONFIG.DEFAULT_GAMMA}}/>
         <Input id="epsilon" name="epsilon" label="Epsilon"
                inputProps={{defaultValue: Q_LEARNING_CONFIG.DEFAULT_EPSILON}}/>
