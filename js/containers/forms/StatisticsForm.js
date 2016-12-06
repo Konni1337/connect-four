@@ -30,7 +30,7 @@ class StatisticsForm extends Component {
 
   renderDatabases(databases) {
     return <ul className="nav nav-pills" role="tablist">
-      {databases.map(this.renderDatabase)}
+      {databases.sort().map(this.renderDatabase)}
     </ul>
   }
 
@@ -49,7 +49,7 @@ class StatisticsForm extends Component {
 
   renderSelectedDatabases(databases) {
     return <ul className="nav nav-pills" role="tablist">
-      {databases.map(this.renderSelectedDatabase)}
+      {databases.sort().map(this.renderSelectedDatabase)}
     </ul>
   }
 
