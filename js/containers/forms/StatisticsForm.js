@@ -1,37 +1,56 @@
 import React, {Component, PropTypes} from "react";
 import {connect} from "react-redux";
-import {core as ZingChart} from 'zingchart-react';
 import * as StatisticsActions from '../../actions/StatisticsActions';
 import Spinner from '../../components/Spinner';
+import Table from '../../components/Table';
+import Chart from '../../components/Chart';
 
 class StatisticsForm extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {selected: -1};
-    this.handleChange = this.handleChange.bind(this);
-    this.renderDatabaseSelect = this.renderDatabaseSelect.bind(this);
+    this.renderDatabase = this.renderDatabase.bind(this);
+    this.renderDatabases = this.renderDatabases.bind(this);
+    this.renderSelectedDatabase = this.renderSelectedDatabase.bind(this);
+    this.renderSelectedDatabases = this.renderSelectedDatabases.bind(this);
+    this.renderActions = this.renderActions.bind(this);
   }
 
-  handleChange(event) {
-    const value = event.target.value;
-    this.setState({
-      selected: value
-    });
-    if (value >= 0) this.props.fetchData(this.props.databases[value]);
+  handleClick(database) {
+    this.props.addDatabase(database);
+    this.props.fetchData(database);
   }
 
-  renderDatabaseOption(value, index) {
-    return <option key={index} value={index}>{value}</option>
+  renderDatabase(value, index) {
+    return <li key={index} role="presentation" className="bg-success" onClick={() => this.handleClick(value)}>
+      <a href="#" className="text-success">{value.slice(5)} <span className="glyphicon glyphicon-plus"
+                                                                  aria-hidden="true"/></a>
+    </li>
   }
 
-  renderDatabaseSelect(databases) {
-    return (
-      <select ref='databases' className="form-control" value={this.state.selected} onChange={this.handleChange}>
-        {this.state.selected === -1 && <option value={-1}>Select a database</option>}
-        {databases.map(this.renderDatabaseOption)}
-      </select>
-    )
+  renderDatabases(databases) {
+    return <ul className="nav nav-pills" role="tablist">
+      {databases.map(this.renderDatabase)}
+    </ul>
+  }
+
+  renderSelectedDatabase(value, index) {
+    return <li key={index} role="presentation">
+      <a href="#"
+         className={this.props.markedDatabases.indexOf(value) >= 0 ? "bg-warning" : "bg-primary"}
+         onClick={() => this.props.markDatabase(value)}>
+        {value.slice(5)}
+        <span className="glyphicon glyphicon-pencil" aria-hidden="true"/>
+        <span onClick={() => this.props.removeDatabase(value)} className="glyphicon glyphicon-remove"
+              aria-hidden="true"/>
+      </a>
+    </li>
+  }
+
+  renderSelectedDatabases(databases) {
+    return <ul className="nav nav-pills" role="tablist">
+      {databases.map(this.renderSelectedDatabase)}
+    </ul>
   }
 
   componentDidMount() {
@@ -41,8 +60,20 @@ class StatisticsForm extends Component {
     }
   }
 
+  renderActions(markedDatabases) {
+    return <div>
+      <label htmlFor="merge">Name for Merge:</label>
+      <input type="text" id="merge" ref="mergeName"/>
+      <button className="btn btn-primary"
+         href="#"
+         onClick={() => this.props.mergeData(this.refs.mergeName.value, markedDatabases, this.props.data)}>
+        Merge
+      </button>
+      </div>
+  }
+
   render() {
-    const {databases, data, isFetching} = this.props;
+    const {databases, selectedDatabases, markedDatabases, data, isFetching} = this.props;
 
     if (isFetching || !databases) {
       return <Spinner />
@@ -50,35 +81,21 @@ class StatisticsForm extends Component {
       return <span>No Databases found.</span>
     } else if (data === null) {
       return <div>
-        {this.renderDatabaseSelect(databases)}
+        {this.renderDatabases(databases)}
       </div>
     } else if (data.length === 0) {
       return <div>
-        {this.renderDatabaseSelect(databases)}
+        {this.renderDatabases(databases)}
         <span>No Content found</span>
       </div>
     } else if (data.length > 0) {
-      const chartConfig = {
-        type: "line",
-        series: [
-          {
-            text: "First Series",
-            values: data
-          }
-        ],
-        legend: "true",
-        theme: "light",
-        title: "Winrate every 10000 games",
-        "scale-y": {
-          zooming: true,
-          "max-value": 100,
-          "min-value": 0
-        }
-      };
       return <div>
-        {this.renderDatabaseSelect(databases)}
-        <ZingChart id="statistics-chart" height="300" width="600" data={chartConfig}/>
-      </div>;
+        {this.renderDatabases(databases)}
+        {this.renderSelectedDatabases(selectedDatabases)}
+        {markedDatabases.length > 0 && this.renderActions(markedDatabases)}
+        <Chart data={data}/>
+        <Table data={data}/>
+      </div>
     } else {
       return <span>This is a Desert</span>
     }
@@ -91,9 +108,15 @@ export default connect(state => {
   return {
     databases: state.statistics.databases,
     data: state.statistics.data,
-    isFetching: state.statistics.isFetching
+    isFetching: state.statistics.isFetching,
+    selectedDatabases: state.statistics.selectedDatabases,
+    markedDatabases: state.statistics.markedDatabases
   }
 }, {
   fetchDatabases: StatisticsActions.fetchDatabases,
+  addDatabase: StatisticsActions.addDatabase,
+  removeDatabase: StatisticsActions.removeDatabase,
+  markDatabase: StatisticsActions.markDatabase,
+  mergeData: StatisticsActions.mergeData,
   fetchData: StatisticsActions.fetchData
 })(StatisticsForm)
