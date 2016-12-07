@@ -23,7 +23,7 @@ export default class Random {
    */
   selectAction(game, callback) {
     if (BEST_FIRST_ACTION && parseInt(stateToString(game.grid)) === 0 && game.grid.length === 7) {
-      return callback({index: 3, player: this.playerId});
+      return callback({index: 3, player: this.id});
     }
     return callback(getRandomElement(game.getValidActions()));
   }
